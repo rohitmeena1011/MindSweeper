@@ -1,9 +1,34 @@
-import { useState } from "react";
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion } from "framer-motion";
 import styles from "./Auth.module.css";
-import React from "react";
+
 const AuthForm = () => {
   const [isSignUp, setIsSignUp] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+  
+    const response = await fetch('/api/auth', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email, password }),
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      localStorage.setItem('authToken', data.token);
+      navigate('/');
+    } else {
+      
+      console.error('Authentication failed');
+    }
+  };
 
   return (
     <div className="flex justify-center items-center h-screen bg-black">
@@ -16,7 +41,7 @@ const AuthForm = () => {
         <h2 className="text-center text-3xl font-bold mb-6 text-blue-400">
           {isSignUp ? "Sign Up" : "Login"}
         </h2>
-        <form className="flex flex-col gap-4">
+        <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
           {isSignUp && (
             <div className="flex items-center gap-2 border-b border-gray-600 pb-2">
               <span className="text-blue-400">👤</span>
@@ -31,6 +56,8 @@ const AuthForm = () => {
             <span className="text-blue-400">📧</span>
             <input
               type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               placeholder="Email"
               className={styles.inputField}
             />
@@ -39,6 +66,8 @@ const AuthForm = () => {
             <span className="text-blue-400">🔒</span>
             <input
               type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               placeholder="Password"
               className={styles.inputField}
             />
