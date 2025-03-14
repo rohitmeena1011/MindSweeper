@@ -69,7 +69,7 @@ const Leaderboard = () => {
                 }`}
                 name={elem.name}
                 score={elem.points}
-                avatar={elem.avatar}
+                
                 rank={index + 1}
                 key={index}
               />
