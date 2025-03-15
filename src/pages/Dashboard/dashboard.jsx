@@ -1,5 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import React, { useEffect, useState } from "react";
+import "./dashboard.css";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -23,17 +24,10 @@ const Dashboard = () => {
 
   return (
     <div className="h-screen bg-gray-900 text-white flex flex-col">
-      {/* Navbar */}
-      <nav className="bg-gray-800 p-4 flex justify-between items-center shadow-md">
-        <h1 className="text-2xl font-bold text-blue-400">MindSweeper</h1>
-        <Link to="/leaderboard" className="text-lg text-gray-300 hover:text-white">
-          Leaderboard
-        </Link>
-        <Link to="/login" className="text-lg text-gray-300 hover:text-white">
-          Login
-        </Link>
-      </nav>
-
+     
+     <div className="typewriter mt-4 text-2xl">
+  <h1>Get Ready To Challenge Your Mind</h1>
+</div>
       {/* Main Section */}
       <div className="flex flex-col items-center justify-center flex-grow gap-8">
         <button

@@ -79,7 +79,7 @@ const AuthForm = () => {
           <button>Forgot Password?</button>
           <button onClick={() => setIsSignUp(!isSignUp)}>
             {isSignUp ? 'Login Instead' : 'Sign Up Instead'}
-          </button>
+          </button> 
         </div>
       </motion.div>
     </div>
