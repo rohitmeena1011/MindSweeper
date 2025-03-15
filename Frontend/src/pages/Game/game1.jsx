@@ -1,110 +1,125 @@
 import React, { useState } from "react";
 import { Button, Card, CardContent, Typography, Grid } from "@mui/material";
 
-// Function to generate a valid target and numbers ensuring a solvable game
-const generateGameData = (keepTarget = null, keepNumbers = null) => {
-  let target = keepTarget ?? Math.floor(Math.random() * 81) + 20; // Target: 20-100
-  let numbers = keepNumbers ? [...keepNumbers] : [];
+const maxSelections = 10; // Number of attempts
+const totalCards = 2 * maxSelections; // Ensuring twice the attempts
+
+const generateGameData = () => {
+  let target = Math.floor(Math.random() * 81) + 20; // Random target (20-100)
+  let numbers = [];
+  let ops = [];
   let currentValue = target;
 
-  if (!keepNumbers) {
-    // Generate a valid sequence ensuring at least one solution exists
-    for (let i = 0; i < 5; i++) {
-      let num = Math.floor(Math.random() * 50) + 1; // Numbers from 1-50
-      let op = ["+", "*", "/"][Math.floor(Math.random() * 3)]; // Removed '-' to avoid negatives
+  // Generate a solvable equation within maxSelections
+  for (let i = 0; i < maxSelections / 2; i++) {
+    let num = Math.floor(Math.random() * 20) + 1;
+    let op = ["+", "-", "*", "/"][Math.floor(Math.random() * 4)];
 
-      if (op === "+") currentValue -= num;
-      else if (op === "*") {
-        if (currentValue * num <= 100) currentValue *= num;
-        else continue;
-      } else if (op === "/") {
-        if (currentValue % num === 0 && currentValue / num > 0) currentValue = Math.floor(currentValue / num);
-        else continue;
-      }
+    if (op === "+") currentValue -= num;
+    else if (op === "-") currentValue += num;
+    else if (op === "*" && currentValue % num === 0) currentValue /= num;
+    else if (op === "/" && currentValue * num <= 100) currentValue *= num;
+    else continue;
 
-      numbers.push({ value: num, flipped: false });
-    }
-
-    numbers.push({ value: currentValue, flipped: false }); // Ensure one final number
-
-    // Fill extra distractor numbers
-    while (numbers.length < 10) {
-      numbers.push({ value: Math.floor(Math.random() * 100) + 1, flipped: false });
-    }
+    numbers.push(num);
+    ops.push(op);
   }
 
-  // Shuffle numbers to hide the correct sequence
+  numbers.push(currentValue); // Ensure the equation is valid
+
+  // Fill extra numbers to meet totalCards requirement
+  while (numbers.length < totalCards) {
+    numbers.push(Math.floor(Math.random() * 30) + 1);
+  }
+
   numbers = numbers.sort(() => Math.random() - 0.5);
 
-  return { target, numbers };
+  return {
+    target,
+    numbers: numbers.map((val) => ({ value: val, flipped: false })),
+    solutionOps: ops,
+  };
 };
 
 const Game1 = () => {
   const [gameData, setGameData] = useState(generateGameData());
   const [selectedCards, setSelectedCards] = useState([]);
   const [selectedOps, setSelectedOps] = useState([]);
-  const [result, setResult] = useState(null);
+  const [ongoingResult, setOngoingResult] = useState(null);
   const [message, setMessage] = useState("");
+  const [attemptsLeft, setAttemptsLeft] = useState(maxSelections);
 
-  // Flip a card and add to selection
   const flipCard = (index) => {
-    if (!gameData.numbers[index].flipped && selectedCards.length < 10) {
+    if (!gameData.numbers[index].flipped && selectedCards.length < maxSelections) {
       let newNumbers = [...gameData.numbers];
       newNumbers[index].flipped = true;
       setGameData({ ...gameData, numbers: newNumbers });
-      setSelectedCards([...selectedCards, newNumbers[index].value]);
+
+      let newSelectedCards = [...selectedCards, newNumbers[index].value];
+      setSelectedCards(newSelectedCards);
+      setAttemptsLeft(attemptsLeft - 1);
+      updateOngoingResult(newSelectedCards, selectedOps);
     }
   };
 
-  // Select an operator
   const selectOperator = (op) => {
     if (selectedOps.length < selectedCards.length - 1) {
-      setSelectedOps([...selectedOps, op]);
+      let newSelectedOps = [...selectedOps, op];
+      setSelectedOps(newSelectedOps);
+      updateOngoingResult(selectedCards, newSelectedOps);
     }
   };
 
-  // Compute the result based on selections
+  const updateOngoingResult = (cards, ops) => {
+    if (cards.length < 2 || ops.length < 1) return;
+    let value = cards[0];
+
+    for (let i = 0; i < ops.length; i++) {
+      if (ops[i] === "+") value += cards[i + 1];
+      else if (ops[i] === "-") value -= cards[i + 1];
+      else if (ops[i] === "*") value *= cards[i + 1];
+      else if (ops[i] === "/" && cards[i + 1] !== 0) value = Math.floor(value / cards[i + 1]);
+    }
+    setOngoingResult(value);
+  };
+
   const calculateResult = () => {
-    if (selectedCards.length < 2) {
-      setMessage("Select at least two numbers.");
+    if (selectedCards.length < 2 || selectedOps.length < 1) {
+      setMessage("⚠️ Select at least two numbers and one operator.");
       return;
     }
 
-    let value = selectedCards[0];
-    for (let i = 0; i < selectedOps.length; i++) {
-      if (selectedOps[i] === "+") value += selectedCards[i + 1];
-      else if (selectedOps[i] === "*") value *= selectedCards[i + 1];
-      else if (selectedOps[i] === "/" && selectedCards[i + 1] !== 0)
-        value = Math.floor(value / selectedCards[i + 1]); // Ensure integer division
+    let finalResult = ongoingResult;
+
+    if (finalResult === gameData.target) {
+      setMessage("🎉 Correct! You Win!");
+    } else {
+      setMessage("❌ Wrong! Cards shuffled. Try again.");
+      reshuffleAndReset();
     }
-
-    setResult(value);
-    setMessage(value === gameData.target ? "🎉 Correct! You Win!" : "❌ Wrong! Try again.");
   };
 
-  // Reset the game and reshuffle cards
-  const resetGame = () => {
-    setGameData(generateGameData());
-    setSelectedCards([]);
-    setSelectedOps([]);
-    setResult(null);
-    setMessage("");
-  };
+  const reshuffleAndReset = () => {
+    let shuffledNumbers = gameData.numbers.map((card) => ({
+      ...card,
+      flipped: false,
+    })).sort(() => Math.random() - 0.5);
 
-  // Replay mode: Same target & numbers, but reshuffled & reset flipped state
-  const replayGame = () => {
-    let newNumbers = gameData.numbers.map((card) => ({ ...card, flipped: false }));
-    setGameData({ target: gameData.target, numbers: newNumbers.sort(() => Math.random() - 0.5) });
+    setGameData({ ...gameData, numbers: shuffledNumbers });
     setSelectedCards([]);
     setSelectedOps([]);
-    setResult(null);
-    setMessage("");
+    setOngoingResult(null);
+    setAttemptsLeft(maxSelections);
   };
 
   return (
     <div style={{ textAlign: "center", padding: "20px" }}>
       <Typography variant="h4" gutterBottom>
         🎯 Target: {gameData.target}
+      </Typography>
+
+      <Typography variant="h6" color="primary">
+        Attempts Left: {attemptsLeft}/{maxSelections}
       </Typography>
 
       {/* Card Grid */}
@@ -133,7 +148,7 @@ const Game1 = () => {
 
       {/* Operator Selection */}
       <div style={{ marginTop: "20px" }}>
-        {["+", "*", "/"].map((op) => (
+        {["+", "-", "*", "/"].map((op) => (
           <Button
             key={op}
             variant="contained"
@@ -147,39 +162,52 @@ const Game1 = () => {
         ))}
       </div>
 
-      {/* Selected Equation */}
+      {/* Ongoing Calculation */}
       <Typography variant="h6" style={{ marginTop: "10px" }}>
         {selectedCards
           .map((num, idx) => (idx < selectedOps.length ? `${num} ${selectedOps[idx]}` : num))
           .join(" ")}
       </Typography>
 
+      {/* Ongoing Result with Dynamic Color */}
+      <Typography
+        variant="h6"
+        style={{
+          marginTop: "10px",
+          color:
+            ongoingResult === gameData.target
+              ? "green"
+              : Math.abs(ongoingResult - gameData.target) <= 10
+              ? "orange"
+              : "red",
+        }}
+      >
+        Ongoing Result: {ongoingResult !== null ? ongoingResult : "N/A"}
+      </Typography>
+
       {/* Submit & Reset Buttons */}
       <div style={{ marginTop: "20px" }}>
-        <Button variant="contained" color="success" onClick={calculateResult} sx={{ margin: "5px" }}>
+        <Button
+          variant="contained"
+          color="success"
+          onClick={calculateResult}
+          sx={{ margin: "5px" }}
+          disabled={selectedCards.length < 2 || selectedOps.length < 1}
+        >
           Submit
         </Button>
-        <Button variant="contained" color="secondary" onClick={resetGame} sx={{ margin: "5px" }}>
+        <Button
+          variant="contained"
+          color="secondary"
+          onClick={() => setGameData(generateGameData())}
+          sx={{ margin: "5px" }}
+        >
           Reset
-        </Button>
-        <Button variant="contained" color="warning" onClick={replayGame} sx={{ margin: "5px" }}>
-          🔄 Replay (Shuffle Cards)
         </Button>
       </div>
 
       {/* Result Message */}
-      {message && (
-        <Typography variant="h6" style={{ marginTop: "10px", color: message.includes("Win") ? "green" : "red" }}>
-          {message}
-        </Typography>
-      )}
-
-      {/* Result Display */}
-      {result !== null && (
-        <Typography variant="h6" style={{ marginTop: "10px" }}>
-          Your Result: {result}
-        </Typography>
-      )}
+      {message && <Typography variant="h6" style={{ marginTop: "10px", color: message.includes("Win") ? "green" : "red" }}>{message}</Typography>}
     </div>
   );
 };

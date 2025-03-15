@@ -1,4 +1,3 @@
-
 import './App.css'
 import React from 'react';
 import AuthForm from './pages/Auth/Auth';
