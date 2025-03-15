@@ -10,11 +10,11 @@ const Leaderboard = () => {
   const [leaderboard, setLeaderboard] = useState([]);
   const [loading, setLoading] = useState(true); 
   const testData = [
-    { name: "Alice", points: 1500},
-    { name: "Bob", points: 1200},
-    { name: "Charlie", points: 1000},
-    { name: "David", points: 900 },
-    { name: "Eve", points: 800},
+    { name: "Alice", points: 1500, avatar: "avatar1.png" },
+    { name: "Bob", points: 1200, avatar: "avatar2.png" },
+    { name: "Charlie", points: 1000, avatar: "avatar3.png" },
+    { name: "David", points: 900, avatar: "avatar4.png" },
+    { name: "Eve", points: 800, avatar: "avatar5.png" },
   ];
 
   useEffect(() => {
