@@ -1,10 +1,11 @@
 const express = require("express");
+const url = require('url');
 const router = express.Router();
 
-const generateGameData = ()=>{
+const generateGameData = (chosenLength)=>{
     let numbers = [];
-    for (let i=0;i<Math.floor(Math.random()*30+10);i++){
-        numbers.push(Math.floor((Math.random())*20)+1);
+    for (let i=0;i<chosenLength*2;i++){
+        numbers.push(Math.floor((Math.random())*40)+1);
     }
     let target = 0;
     let operators = ["+","-","*","/"];
@@ -15,8 +16,10 @@ const generateGameData = ()=>{
     target+=number;
     chosenNumbers.push(number);
     numbers.splice(j,1);
-    const upper = numbers.length;
-    for (let i=1;i<Math.floor(Math.random()*Math.floor(upper/2))+2;i++){
+    // const upper = numbers.length;
+    chosenLength = Math.max(chosenLength,2);
+    for (let i=1;i<chosenLength;i++){
+        if (numbers.length === 0) break;
         let j = Math.floor(Math.random()*(numbers.length))
         let number = numbers[j]
         let operator = operators[Math.floor(Math.random()*4)]
@@ -34,6 +37,10 @@ const generateGameData = ()=>{
     return {target,numbers,chosenNumbers,operatorPool};
 }
 
-router.get("/generate-game", (req, res) => res.json(generateGameData()));
+router.get("/generate-game", (req, res) => {
+    let chosenLength = parseInt(req.query.length) || 2;
+    res.json(generateGameData(chosenLength));
+});
 
 module.exports = router;
+
