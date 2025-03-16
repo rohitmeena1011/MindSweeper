@@ -2,37 +2,38 @@ import React, { useState, useEffect } from "react";
 import { Button, Card, CardContent, Typography, Grid } from "@mui/material";
 import axios from "axios";
 
-const maxSelections = 10;
-
 const Game1 = () => {
   const [gameData, setGameData] = useState(null);
   const [selectedCards, setSelectedCards] = useState([]);
   const [selectedOps, setSelectedOps] = useState([]);
   const [ongoingResult, setOngoingResult] = useState(null);
   const [message, setMessage] = useState("");
-  const [attemptsLeft, setAttemptsLeft] = useState(maxSelections);
+ 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [attemptsLeft, setAttemptsLeft] = useState(0);
 
-  const fetchGameData = async () => {
-    try {
-      setLoading(true);
-      const response = await axios.get("http://localhost:5000/api/generate-game");
-      setGameData(response.data);
-      setLoading(false);
-    } catch (err) {
-      console.error("Error fetching game data:", err);
-      setError("Failed to load game data");
-      setLoading(false);
-    }
-  };
+const fetchGameData = async () => {
+  try {
+    setLoading(true);
+    const response = await axios.get("http://localhost:5000/api/generate-game");
+    setGameData(response.data);
+    setAttemptsLeft(response.data.chosenNumbers.length);  // Set based on backend
+    setLoading(false);
+  } catch (err) {
+    console.error("Error fetching game data:", err);
+    setError("Failed to load game data");
+    setLoading(false);
+  }
+};
 
-  useEffect(() => {
-    fetchGameData();
-  }, []);
+useEffect(() => {
+  fetchGameData();
+}, []);
+
 
   const flipCard = (index) => {
-    if (!gameData.numbers[index].flipped && selectedCards.length < maxSelections) {
+    if (!gameData.numbers[index].flipped && selectedCards.length <gameData.chosenNumbers.length) {
       let newNumbers = gameData.numbers.map((card, i) =>
         i === index ? { ...card, flipped: true } : card
       );
@@ -90,9 +91,10 @@ const Game1 = () => {
     setSelectedCards([]);
     setSelectedOps([]);
     setOngoingResult(null);
-    setAttemptsLeft(maxSelections);
+    setAttemptsLeft(gameData.chosenNumbers.length);  
+    setMessage("");
   };
-
+  
   if (loading) return <Typography variant="h5">Loading game data...</Typography>;
   if (error) return <Typography variant="h5" color="error">{error}</Typography>;
 
@@ -103,7 +105,7 @@ const Game1 = () => {
       </Typography>
 
       <Typography variant="h6" color="primary">
-        Attempts Left: {attemptsLeft}/{maxSelections}
+      Attempts Left: {attemptsLeft}/{gameData.chosenNumbers.length}
       </Typography>
 
       <Grid container spacing={2} justifyContent="center">
