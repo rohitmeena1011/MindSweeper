@@ -47,7 +47,7 @@ const Game1 = () => {
 
   const selectOperator = (op) => {
     if (selectedCards.length < 2) {
-      setMessage("⚠️ Select at least two numbers first.");
+      setMessage("Select at least two numbers first.");
       return;
     }
 
@@ -99,7 +99,7 @@ const Game1 = () => {
   return (
     <div style={{ textAlign: "center", padding: "20px" }}>
       <Typography variant="h4" gutterBottom>
-        🎯 Target: {gameData.target}
+         Target: {gameData.target}
       </Typography>
 
       <Typography variant="h6" color="primary">
@@ -166,7 +166,6 @@ const Game1 = () => {
         Ongoing Result: {ongoingResult !== null ? ongoingResult : "N/A"}
       </Typography>
 
-      {/* Result Message */}
       {message && (
         <Typography
           variant="h6"
