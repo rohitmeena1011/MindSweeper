@@ -18,7 +18,7 @@ function App() {
       <Route path="/login" element={<AuthForm />} />
   
       <Route path="/leaderboard" element={<Leaderboard />} />
-      <Route path="/game1" element={<Game1/>} />
+      <Route path="/game1/:length" element={<Game1/>} />
       <Route path="/game2" element={<Game2 />} />
    </Routes>
 

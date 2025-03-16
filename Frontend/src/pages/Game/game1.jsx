@@ -1,39 +1,50 @@
 import React, { useState, useEffect } from "react";
 import { Button, Card, CardContent, Typography, Grid } from "@mui/material";
 import axios from "axios";
+import { useParams } from "react-router-dom";
 
 const Game1 = () => {
+  const { length } = useParams();
   const [gameData, setGameData] = useState(null);
   const [selectedCards, setSelectedCards] = useState([]);
   const [selectedOps, setSelectedOps] = useState([]);
   const [ongoingResult, setOngoingResult] = useState(null);
   const [message, setMessage] = useState("");
- 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [attemptsLeft, setAttemptsLeft] = useState(0);
 
-const fetchGameData = async () => {
-  try {
-    setLoading(true);
-    const response = await axios.get("http://localhost:5000/api/generate-game");
-    setGameData(response.data);
-    setAttemptsLeft(response.data.chosenNumbers.length);  // Set based on backend
-    setLoading(false);
-  } catch (err) {
-    console.error("Error fetching game data:", err);
-    setError("Failed to load game data");
-    setLoading(false);
-  }
-};
+  const fetchGameData = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get(
+        `http://localhost:5000/api/generate-game?length=${length}`
+      );
+      setGameData({
+        ...response.data,
+        numbers: response.data.numbers.map((num) => ({
+          value: num,
+          flipped: false,
+        })),
+      });
+      setAttemptsLeft(response.data.chosenNumbers.length);
+      setLoading(false);
+    } catch (err) {
+      console.error("Error fetching game data:", err);
+      setError("Failed to load game data");
+      setLoading(false);
+    }
+  };
 
-useEffect(() => {
-  fetchGameData();
-}, []);
-
+  useEffect(() => {
+    fetchGameData();
+  }, [length]);
 
   const flipCard = (index) => {
-    if (!gameData.numbers[index].flipped && selectedCards.length <gameData.chosenNumbers.length) {
+    if (
+      !gameData.numbers[index].flipped &&
+      selectedCards.length < gameData.chosenNumbers.length
+    ) {
       let newNumbers = gameData.numbers.map((card, i) =>
         i === index ? { ...card, flipped: true } : card
       );
@@ -64,7 +75,8 @@ useEffect(() => {
       if (ops[i] === "+") value += cards[i + 1];
       else if (ops[i] === "-") value -= cards[i + 1];
       else if (ops[i] === "*") value *= cards[i + 1];
-      else if (ops[i] === "/" && cards[i + 1] !== 0) value = Math.floor(value / cards[i + 1]);
+      else if (ops[i] === "/" && cards[i + 1] !== 0)
+        value = Math.floor(value / cards[i + 1]);
     }
 
     setOngoingResult(value);
@@ -82,7 +94,10 @@ useEffect(() => {
   };
 
   const resetGame = () => {
-    let resetNumbers = gameData.numbers.map((card) => ({ ...card, flipped: false }));
+    let resetNumbers = gameData.numbers.map((card) => ({
+      ...card,
+      flipped: false,
+    }));
     setGameData({ ...gameData, numbers: resetNumbers });
     resetState();
   };
@@ -91,46 +106,51 @@ useEffect(() => {
     setSelectedCards([]);
     setSelectedOps([]);
     setOngoingResult(null);
-    setAttemptsLeft(gameData.chosenNumbers.length);  
+    setAttemptsLeft(gameData.chosenNumbers.length);
     setMessage("");
   };
-  
-  if (loading) return <Typography variant="h5">Loading game data...</Typography>;
-  if (error) return <Typography variant="h5" color="error">{error}</Typography>;
+
+  if (loading)
+    return <Typography variant="h5">Loading game data...</Typography>;
+  if (error)
+    return (
+      <Typography variant="h5" color="error">
+        {error}
+      </Typography>
+    );
 
   return (
     <div style={{ textAlign: "center", padding: "20px" }}>
       <Typography variant="h4" gutterBottom>
-         Target: {gameData.target}
+        Target: {gameData.target}
       </Typography>
 
       <Typography variant="h6" color="primary">
-      Attempts Left: {attemptsLeft}/{gameData.chosenNumbers.length}
+        Attempts Left: {attemptsLeft}/{gameData.chosenNumbers.length}
       </Typography>
 
       <Grid container spacing={2} justifyContent="center">
-  {gameData.numbers.map((card, index) => (
-    <Grid item key={index}>
-      <Card
-        onClick={() => flipCard(index)}
-        sx={{
-          width: 80,
-          height: 120,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          backgroundColor: card.flipped ? "yellow" : "gray",
-          color: "black",
-          fontSize: 20,
-          cursor: card.flipped ? "default" : "pointer",
-        }}
-      >
-        <CardContent>{card.flipped ? card.value : "?"}</CardContent>
-      </Card>
-    </Grid>
-  ))}
-</Grid>
-
+        {gameData.numbers.map((card, index) => (
+          <Grid item key={index}>
+            <Card
+              onClick={() => flipCard(index)}
+              sx={{
+                width: 80,
+                height: 120,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                backgroundColor: card.flipped ? "yellow" : "gray",
+                color: "black",
+                fontSize: 20,
+                cursor: card.flipped ? "default" : "pointer",
+              }}
+            >
+              <CardContent>{card.flipped ? card.value : "?"}</CardContent>
+            </Card>
+          </Grid>
+        ))}
+      </Grid>
 
       <div style={{ marginTop: "20px" }}>
         {["+", "-", "*", "/"].map((op) => (
@@ -147,11 +167,12 @@ useEffect(() => {
       </div>
 
       <Typography variant="h6" style={{ marginTop: "10px" }}>
-  {selectedCards
-    .map((num, idx) => (idx < selectedOps.length ? `${num} ${selectedOps[idx]}` : num))
-    .join(" ")}
-</Typography>
-
+        {selectedCards
+          .map((num, idx) =>
+            idx < selectedOps.length ? `${num} ${selectedOps[idx]}` : num
+          )
+          .join(" ")}
+      </Typography>
 
       <Typography
         variant="h6"
@@ -171,7 +192,10 @@ useEffect(() => {
       {message && (
         <Typography
           variant="h6"
-          style={{ marginTop: "10px", color: message.includes("Win") ? "green" : "red" }}
+          style={{
+            marginTop: "10px",
+            color: message.includes("Win") ? "green" : "red",
+          }}
         >
           {message}
         </Typography>
