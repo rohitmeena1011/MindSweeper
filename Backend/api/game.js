@@ -1,31 +1,38 @@
 const express = require("express");
 const router = express.Router();
 
-const generateGameData = () => {
-  let target = Math.floor(Math.random() * 81) + 20;
-  let numbers = new Set();
-  let correctNumbers = [];
-  let ops = ["+", "-", "*", "/"];
-
-  let currentValue = target;
-  while (correctNumbers.length < 5) {
-    let num = Math.floor(Math.random() * 20) + 1;
-    let op = ops[Math.floor(Math.random() * 4)];
-
-    if (op === "+") currentValue -= num;
-    else if (op === "-" && currentValue >= num) currentValue += num;
-    else if (op === "*" && currentValue % num === 0) currentValue /= num;
-    else if (op === "/" && currentValue * num <= 100) currentValue *= num;
-    else continue;
-
-    correctNumbers.push(num);
-    numbers.add(num);
-  }
-
-  while (numbers.size < 20) numbers.add(Math.floor(Math.random() * 30) + 1);
-
-  return { target, numbers: Array.from(numbers).sort(() => Math.random() - 0.5) };
-};
+const generateGameData = ()=>{
+    let numbers = [];
+    for (let i=0;i<Math.floor(Math.random()*30+10);i++){
+        numbers.push(Math.floor((Math.random())*20)+1);
+    }
+    let target = 0;
+    let operators = ["+","-","*","/"];
+    let chosenNumbers = [];
+    let operatorPool = [];
+    let j = Math.floor(Math.random()*(numbers.length))
+    let number = numbers[j];
+    target+=number;
+    chosenNumbers.push(number);
+    numbers.splice(j,1);
+    const upper = numbers.length;
+    for (let i=1;i<Math.floor(Math.random()*Math.floor(upper/2))+2;i++){
+        let j = Math.floor(Math.random()*(numbers.length))
+        let number = numbers[j]
+        let operator = operators[Math.floor(Math.random()*4)]
+        if (operator==="+") target+=number;
+        else if (operator==="-") target-=number;
+        else if (operator==="*") target*=number;
+        else if (operator==="/") target=Math.floor(target/number);
+        else continue;
+        chosenNumbers.push(number);
+        numbers.splice(j,1);
+        operatorPool.push(operator);
+    }
+    numbers.push(...chosenNumbers);
+    numbers.sort();
+    return {target,numbers,chosenNumbers,operatorPool};
+}
 
 router.get("/generate-game", (req, res) => res.json(generateGameData()));
 
