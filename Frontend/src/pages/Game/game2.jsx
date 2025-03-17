@@ -27,6 +27,32 @@ const Game2 = () => {
   const [initialOperators, setInitialOperators] = useState([]);
   const [message, setMessage] = useState('');
 
+  // Function to load a new game (new target and pool) from the API.
+  const loadNewGame = () => {
+    fetch(`http://localhost:5000/api/generate-game?length=${gameLength}`)
+      .then(response => response.json())
+      .then(data => {
+        // API returns: { target, chosenNumbers, operatorPool }
+        const shuffledNumbers = shuffleArray(data.chosenNumbers);
+        const shuffledOperators = shuffleArray(data.operatorPool);
+        setTarget(data.target);
+        setAvailableNumbers(shuffledNumbers);
+        setAvailableOperators(shuffledOperators);
+        setInitialNumbers(shuffledNumbers);
+        setInitialOperators(shuffledOperators);
+        setPlacedNodes(Array(shuffledNumbers.length).fill(null));
+        setPlacedEdges(Array(shuffledOperators.length).fill(null));
+        // Save to localStorage for persistence.
+        localStorage.setItem(localStorageKey, JSON.stringify({
+          target: data.target,
+          initialNumbers: shuffledNumbers,
+          initialOperators: shuffledOperators
+        }));
+        setMessage('');
+      })
+      .catch(err => console.error("Error fetching new game data:", err));
+  };
+
   useEffect(() => {
     // Check if game data exists in localStorage.
     const savedData = localStorage.getItem(localStorageKey);
@@ -41,28 +67,7 @@ const Game2 = () => {
       setPlacedEdges(Array(parsed.initialOperators.length).fill(null));
     } else {
       // Otherwise, fetch new game data.
-      fetch(`http://localhost:5000/api/generate-game?length=${gameLength}`)
-        .then(response => response.json())
-        .then(data => {
-          // API returns: { target, chosenNumbers, operatorPool }
-          // Reshuffle the arrays.
-          const shuffledNumbers = shuffleArray(data.chosenNumbers);
-          const shuffledOperators = shuffleArray(data.operatorPool);
-          setTarget(data.target);
-          setAvailableNumbers(shuffledNumbers);
-          setAvailableOperators(shuffledOperators);
-          setInitialNumbers(shuffledNumbers);
-          setInitialOperators(shuffledOperators);
-          setPlacedNodes(Array(shuffledNumbers.length).fill(null));
-          setPlacedEdges(Array(shuffledOperators.length).fill(null));
-          // Save to localStorage so that the same game is restored on refresh.
-          localStorage.setItem(localStorageKey, JSON.stringify({
-            target: data.target,
-            initialNumbers: shuffledNumbers,
-            initialOperators: shuffledOperators
-          }));
-        })
-        .catch(err => console.error("Error fetching game data:", err));
+      loadNewGame();
     }
   }, [gameLength, localStorageKey]);
 
@@ -129,7 +134,11 @@ const Game2 = () => {
     if (nodes.every(val => val !== null) && edges.every(val => val !== null)) {
       const finalResult = computeResult(nodes, edges);
       if (finalResult === target) {
-        setMessage("Congratulations! Correct result achieved.");
+        setMessage("Congratulations! Correct result achieved. Loading new game...");
+        // After a short delay, load a new game.
+        setTimeout(() => {
+          loadNewGame();
+        }, 2000);
       } else {
         setMessage("Incorrect result. Resetting game...");
         setTimeout(() => {
@@ -277,4 +286,3 @@ const Game2 = () => {
 };
 
 export default Game2;
-
