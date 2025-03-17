@@ -19,7 +19,7 @@ function App() {
   
       <Route path="/leaderboard" element={<Leaderboard />} />
       <Route path="/game1/:length" element={<Game1/>} />
-      <Route path="/game2" element={<Game2 />} />
+      <Route path="/game2/:length" element={<Game2 />} />
    </Routes>
 
     </Router>
