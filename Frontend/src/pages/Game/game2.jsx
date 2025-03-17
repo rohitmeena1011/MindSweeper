@@ -14,7 +14,7 @@ const shuffleArray = (array) => {
 const Game2 = () => {
   const { length } = useParams();
   const gameLength = parseInt(length) || 2;
-  // Use a unique key for localStorage per gameLength.
+  
   const localStorageKey = `game2Data_${gameLength}`;
 
   const [target, setTarget] = useState(null);
@@ -164,67 +164,78 @@ const Game2 = () => {
 
       {/* Game Board */}
       <div style={{ margin: '20px 0' }}>
-        <h3>Game Board</h3>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          {placedNodes.map((node, index) => (
-            <React.Fragment key={`node-${index}`}>
-              {/* Node as a perfect circle */}
-              <div
-                onDrop={(e) => onDropNode(e, index)}
-                onDragOver={allowDrop}
-                style={{
-                  width: '70px',
-                  height: '70px',
-                  borderRadius: '50%',
-                  border: '2px solid #333',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  margin: '10px',
-                  backgroundColor: index === 0 ? '#d4f7d4' : '#fff',
-                  fontSize: '20px',
-                  fontWeight: 'bold',
-                  color: '#333'
-                }}
-              >
-                {node !== null ? node : (index === 0 ? "Start" : "")}
-              </div>
-              {/* Edge as a squared diamond (square rotated 45°) */}
-              {index < placedEdges.length && (
-                <div
-                  onDrop={(e) => onDropEdge(e, index)}
-                  onDragOver={allowDrop}
-                  style={{
-                    width: '60px',
-                    height: '60px',
-                    border: '2px solid #007bff',
-                    backgroundColor: '#f0f8ff',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    margin: '10px',
-                    transform: 'rotate(45deg)'
-                  }}
-                >
-                  <div style={{
-                    transform: 'rotate(-45deg)',
-                    fontSize: '20px',
-                    fontWeight: 'bold',
-                    color: '#007bff'
-                  }}>
-                    {placedEdges[index] ? placedEdges[index] : ''}
-                  </div>
-                </div>
-              )}
-            </React.Fragment>
-          ))}
+  <h3>Game Board</h3>
+  <div
+    style={{
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      flexWrap: 'wrap',
+      gap: '5px',
+      maxWidth: '100%',
+    }}
+  >
+    {placedNodes.map((node, index) => (
+      <React.Fragment key={`node-${index}`}>
+        {/* Node as a perfect circle */}
+        <div
+          onDrop={(e) => onDropNode(e, index)}
+          onDragOver={allowDrop}
+          style={{
+            width: '60px',
+            height: '60px',
+            borderRadius: '50%',
+            border: '2px solid #333',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            margin: '5px',
+            backgroundColor: index === 0 ? '#d4f7d4' : '#fff',
+            fontSize: '18px',
+            fontWeight: 'bold',
+            color: '#333',
+          }}
+        >
+          {node !== null ? node : index === 0 ? 'Start' : ''}
         </div>
-      </div>
+        {/* Edge as a squared diamond */}
+        {index < placedEdges.length && (
+          <div
+            onDrop={(e) => onDropEdge(e, index)}
+            onDragOver={allowDrop}
+            style={{
+              width: '50px',
+              height: '50px',
+              border: '2px solid #007bff',
+              backgroundColor: '#f0f8ff',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              margin: '5px',
+              transform: 'rotate(45deg)',
+            }}
+          >
+            <div
+              style={{
+                transform: 'rotate(-45deg)',
+                fontSize: '18px',
+                fontWeight: 'bold',
+                color: '#007bff',
+              }}
+            >
+              {placedEdges[index] ? placedEdges[index] : ''}
+            </div>
+          </div>
+        )}
+      </React.Fragment>
+    ))}
+  </div>
+</div>
 
       {/* Available Numbers */}
       <div style={{ margin: '20px 0' }}>
         <h3>Available Numbers</h3>
-        <div style={{ display: 'flex', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center',alignItems: 'center' }}>
           {availableNumbers.map((num, idx) => (
             <div
               key={`num-${idx}`}
@@ -255,7 +266,7 @@ const Game2 = () => {
       {/* Available Operators */}
       <div style={{ margin: '20px 0' }}>
         <h3>Available Operators</h3>
-        <div style={{ display: 'flex', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap' ,justifyContent: 'center',alignItems: 'center'}}>
           {availableOperators.map((op, idx) => (
             <div
               key={`op-${idx}`}
