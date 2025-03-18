@@ -1,46 +1,83 @@
 const express = require("express");
-const url = require('url');
+const mongoose = require("mongoose");
 const router = express.Router();
+const Game = require("../models/Game");
 
-const generateGameData = (chosenLength)=>{
+// Function to generate game data
+const generateGameData = (chosenLength) => {
     let numbers = [];
-    for (let i=0;i<chosenLength*2;i++){
-        numbers.push(Math.floor((Math.random())*40)+1);
+    for (let i = 0; i < chosenLength * 2; i++) {
+        numbers.push(Math.floor(Math.random() * 40) + 1);
     }
+
     let target = 0;
-    let operators = ["+","-","*","/"];
+    let operators = ["+", "-", "*", "/"];
     let chosenNumbers = [];
     let operatorPool = [];
-    let j = Math.floor(Math.random()*(numbers.length))
+
+    // Select the first number
+    let j = Math.floor(Math.random() * numbers.length);
     let number = numbers[j];
-    target+=number;
+    target += number;
     chosenNumbers.push(number);
-    numbers.splice(j,1);
-    // const upper = numbers.length;
-    chosenLength = Math.max(chosenLength,2);
-    for (let i=1;i<chosenLength;i++){
+    numbers.splice(j, 1);
+
+    // Ensure at least two numbers are used
+    chosenLength = Math.max(chosenLength, 2);
+
+    for (let i = 1; i < chosenLength; i++) {
         if (numbers.length === 0) break;
-        let j = Math.floor(Math.random()*(numbers.length))
-        let number = numbers[j]
-        let operator = operators[Math.floor(Math.random()*4)]
-        if (operator==="+") target+=number;
-        else if (operator==="-") target-=number;
-        else if (operator==="*") target*=number;
-        else if (operator==="/") target=Math.floor(target/number);
-        else continue;
-        chosenNumbers.push(number);
-        numbers.splice(j,1);
-        operatorPool.push(operator);
+
+        let j = Math.floor(Math.random() * numbers.length);
+        let number = numbers[j];
+        let operator = operators[Math.floor(Math.random() * 4)];
+
+        // Check if applying the operation keeps target in bounds
+        let newTarget = target;
+        if (operator === "+") newTarget += number;
+        else if (operator === "-") newTarget -= number;
+        else if (operator === "*") newTarget *= number;
+        else if (operator === "/" && number !== 0 && target % number === 0) newTarget = Math.floor(target / number);
+        else continue; // Skip invalid division cases
+
+        if (newTarget >= 0 && newTarget <= 200) {
+            target = newTarget;
+            chosenNumbers.push(number);
+            operatorPool.push(operator);
+            numbers.splice(j, 1);
+        }
     }
+
     numbers.push(...chosenNumbers);
     numbers.sort();
-    return {target,numbers,chosenNumbers,operatorPool};
-}
 
-router.get("/generate-game", (req, res) => {
-    let chosenLength = parseInt(req.query.length) || 2;
-    res.json(generateGameData(chosenLength));
+    return { target, numbers, chosenNumbers, operatorPool };
+};
+
+// Route to generate and store game data
+router.get("/generate-game", async (req, res) => {
+    try {
+        let chosenLength = parseInt(req.query.length) || 2;
+        let gameData = generateGameData(chosenLength);
+
+        // Generate a unique game ID
+        const game = new Game({
+            id: Math.floor(Math.random() * 1000000), // Generate a random game ID
+            target: gameData.target,
+            numbers: gameData.numbers,
+            chosenNumbers: gameData.chosenNumbers,
+            operatorPool: gameData.operatorPool
+        });
+
+        // Save to MongoDB
+        const savedGame = await game.save();
+
+        // Send response with the stored game details
+        res.json({ gameId: savedGame.id, ...gameData });
+    } catch (error) {
+        console.error("Error generating game:", error);
+        res.status(500).json({ error: "Internal server error" });
+    }
 });
 
 module.exports = router;
-

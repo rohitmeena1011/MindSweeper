@@ -22,5 +22,8 @@ app.use("/api/auth", authRoutes);
 const gameRoutes = require("./api/game");
 app.use("/api", gameRoutes);
 
+const pointRoutes = require("./api/points.js");
+app.use("/api",pointRoutes);
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
