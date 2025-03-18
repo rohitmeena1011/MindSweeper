@@ -18,6 +18,17 @@ const Game1 = () => {
     fetchGameData(6);
   }, []);
 
+  const saveGameState = (state) => {
+    localStorage.setItem("gameState", JSON.stringify(state));
+  };
+  const loadGameState = () => {
+    const savedState = localStorage.getItem("gameState");
+    if (savedState) {
+      return JSON.parse(savedState);
+    }
+    return null;
+  };
+
   const fetchGameData = async (length) => {
     try {
       setLoading(true);
@@ -44,6 +55,26 @@ const Game1 = () => {
     }
   };
 
+  useEffect(() => {
+    const savedState = loadGameState();
+    if (savedState && savedState.gameData) {
+      setGameData(savedState.gameData);
+      setSelectedCards(savedState.selectedCards);
+      setSelectedOps(savedState.selectedOps);
+      setAttemptsLeft(savedState.attemptsLeft);
+      setLoading(false);
+    } else {
+      fetchGameData();
+    }
+  }, [length]);
+
+  // Save state changes to localStorage
+  useEffect(() => {
+    if (gameData) {
+      saveGameState({ gameData, selectedCards, selectedOps, attemptsLeft });
+    }
+  }, [gameData, selectedCards, selectedOps, attemptsLeft]);
+
   const flipCard = (index) => {
     if (!gameData || gameData.numbers[index].flipped || attemptsLeft <= 0) return;
 
@@ -58,6 +89,10 @@ const Game1 = () => {
 
     if (newSelectedCards.length === selectedOps.length + 1) {
       calculateResult(newSelectedCards, selectedOps);
+
+      if (newSelectedCards.length > 1 && newSelectedCards.length === selectedOps.length + 1) {
+        calculateResult(newSelectedCards, selectedOps);
+      }
     }
   };
 
@@ -201,4 +236,3 @@ const Game1 = () => {
 };
 
 export default Game1;
-

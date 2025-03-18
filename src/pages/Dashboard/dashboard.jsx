@@ -7,10 +7,10 @@ const Dashboard = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    const token = localStorage.getItem("authToken");
-    setIsAuthenticated(!!token);
+    const token = localStorage.getItem("authToken"); 
+    setIsAuthenticated(!!token); 
     if (!token) {
-      navigate("/login");
+      navigate('/login');
     }
   }, [navigate]);
 
@@ -24,10 +24,11 @@ const Dashboard = () => {
 
   return (
     <div className="h-screen bg-gray-900 text-white flex flex-col">
-      <div className="typewriter mt-4 text-2xl">
-        <h1>Get Ready To Challenge Your Mind</h1>
-      </div>
-
+     
+     <div className="typewriter mt-4 text-2xl">
+  <h1>Get Ready To Challenge Your Mind</h1>
+</div>
+      {/* Main Section */}
       <div className="flex flex-col items-center justify-center flex-grow gap-8">
         <button
           onClick={() => handleGameClick("/game1")}
@@ -36,7 +37,7 @@ const Dashboard = () => {
           Game 1
         </button>
         <button
-          onClick={() => handleGameClick("/game2choose")}
+          onClick={() => handleGameClick("/game2")}
           className="w-64 h-24 flex items-center justify-center bg-red-500 rounded-2xl shadow-lg text-white font-bold text-2xl uppercase tracking-wider transition-all transform hover:scale-110 hover:bg-red-700"
         >
           Game 2
