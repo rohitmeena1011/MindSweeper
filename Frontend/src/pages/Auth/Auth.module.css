@@ -50,17 +50,17 @@ body {
 }
 
 .authBox {
-    width: 90%; /* Ensure it does not exceed the viewport width */
+    width: 90%; 
     max-width: 400px;
     padding: 2rem;
-    box-sizing: border-box; /* Include padding and border in the element's total width and height */
+    box-sizing: border-box;
     background: rgba(255, 255, 255, 0.13);
     backdrop-filter: blur(10px);
     border-radius: 10px;
     border: 2px solid rgba(255, 255, 255, 0.1);
     box-shadow: 0 0 40px rgba(8, 7, 16, 0.6);
     text-align: center;
-    overflow: hidden; /* Prevent internal overflow */
+    overflow: hidden; 
 }
 
 .authTitle {

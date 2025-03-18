@@ -81,7 +81,7 @@ const AuthForm = () => {
           </motion.button>
         </form>
         <div className={styles.authFooter}>
-          <button>Forgot Password?</button>
+         
           <button onClick={() => setIsSignUp(!isSignUp)}>
             {isSignUp ? 'Login Instead' : 'Sign Up Instead'}
           </button>

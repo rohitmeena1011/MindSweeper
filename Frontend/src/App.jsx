@@ -7,6 +7,7 @@ import Leaderboard from './pages/Leaderboard/leaderboard';
 
 import Game1 from './pages/Game/game1';
 import Game2 from './pages/Game/game2';
+import Game2choose from './pages/Game/game2choose';
 import Navbar from './components/Navbar';
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
       <Route path="/leaderboard" element={<Leaderboard />} />
       <Route path="/game1/:length" element={<Game1/>} />
       <Route path="/game2/:length" element={<Game2 />} />
+      <Route path="/game2choose" element={<Game2choose />} />
    </Routes>
 
     </Router>
