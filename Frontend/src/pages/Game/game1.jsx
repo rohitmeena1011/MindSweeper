@@ -18,7 +18,6 @@ const Game1 = () => {
     fetchGameData(6);
   }, []);
 
-  const fetchGameData = async (length) => {
   const saveGameState = (state) => {
     localStorage.setItem("gameState", JSON.stringify(state));
   };
@@ -234,6 +233,6 @@ const Game1 = () => {
       )}
     </div>
   );
-};}
+};
 
 export default Game1;
