@@ -99,22 +99,30 @@
 
 // export default AuthForm;
 
-
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import styles from './Auth.module.css';
+import React, { useState, useContext } from "react";
+import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+import styles from "./Auth.module.css";
+import { AuthContext } from "../../AuthContext"; 
 
 const AuthForm = () => {
   const [isSignUp, setIsSignUp] = useState(false);
-  const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const navigate = useNavigate();
+
+  const { login } = useContext(AuthContext); 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (isSignUp && password !== confirmPassword) {
+      alert("Passwords do not match!");
+      return;
+    }
+
     const endpoint = isSignUp
       ? "http://localhost:5000/api/auth/signup"
       : "http://localhost:5000/api/auth/login";
@@ -129,10 +137,11 @@ const AuthForm = () => {
       const data = await response.json();
 
       if (response.ok) {
-        localStorage.setItem("authToken", data.token);
+        login(data.token);
         navigate("/");
       } else {
         console.error("Authentication failed:", data.message);
+        alert(data.message);
       }
     } catch (error) {
       console.error("Error:", error);
@@ -151,7 +160,7 @@ const AuthForm = () => {
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.5 }}
       >
-        <h2 className={styles.authTitle}>{isSignUp ? 'Sign Up' : 'Login'}</h2>
+        <h2 className={styles.authTitle}>{isSignUp ? "Sign Up" : "Login"}</h2>
         <form onSubmit={handleSubmit}>
           {isSignUp && (
             <div className={styles.inputContainer}>
@@ -202,13 +211,12 @@ const AuthForm = () => {
             </div>
           )}
           <motion.button whileHover={{ scale: 1.05 }} className={styles.authButton}>
-            {isSignUp ? 'Sign Up' : 'Login'}
+            {isSignUp ? "Sign Up" : "Login"}
           </motion.button>
         </form>
         <div className={styles.authFooter}>
-         
           <button onClick={() => setIsSignUp(!isSignUp)}>
-            {isSignUp ? 'Login Instead' : 'Sign Up Instead'}
+            {isSignUp ? "Login Instead" : "Sign Up Instead"}
           </button>
         </div>
       </motion.div>
@@ -217,4 +225,3 @@ const AuthForm = () => {
 };
 
 export default AuthForm;
-

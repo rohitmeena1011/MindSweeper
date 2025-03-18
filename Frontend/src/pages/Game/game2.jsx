@@ -54,7 +54,7 @@ const Game2 = () => {
   };
 
   useEffect(() => {
-    // Check if game data exists in localStorage.
+    
     const savedData = localStorage.getItem(localStorageKey);
     if (savedData) {
       const parsed = JSON.parse(savedData);

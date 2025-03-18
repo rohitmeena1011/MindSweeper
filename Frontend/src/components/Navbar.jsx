@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useContext } from "react"; 
 import { 
   AppBar, Toolbar, Typography, Button, IconButton, Menu, MenuItem 
 } from "@mui/material";
@@ -6,29 +6,18 @@ import { Link, useNavigate } from "react-router-dom";
 import { Psychology, Leaderboard, Login, Logout, Menu as MenuIcon } from "@mui/icons-material";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
+import { AuthContext } from "../AuthContext"; 
 
 const Navbar = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const navigate = useNavigate();
+  const [anchorEl, setAnchorEl] = useState(null);
 
-  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("authToken"));
-
-  useEffect(() => {
-    const handleStorageChange = () => {
-      setIsLoggedIn(!!localStorage.getItem("authToken"));
-    };
-
-    window.addEventListener("storage", handleStorageChange);
-
-    return () => {
-      window.removeEventListener("storage", handleStorageChange);
-    };
-  }, []);
+  const { isLoggedIn, logout } = useContext(AuthContext);; 
 
   const handleLogout = () => {
-    localStorage.removeItem("authToken");
-    setIsLoggedIn(false); 
+    logout();
     navigate("/login");
   };
 
@@ -67,7 +56,7 @@ const Navbar = () => {
                 <Leaderboard sx={{ mr: 1 }} /> Leaderboard
               </MenuItem>
               {isLoggedIn ? (
-                <MenuItem onClick={handleLogout}>
+                <MenuItem onClick={() => { handleLogout(); setAnchorEl(null); }}>
                   <Logout sx={{ mr: 1 }} /> Logout
                 </MenuItem>
               ) : (

@@ -12,18 +12,21 @@ export default function Game2choose() {
   ];
 
   return (
-    <div className="min-h-screen flex flex-col items-center bg-gradient-to-r from-purple-800 to-black text-white justify-center">
-   
-      <h1 className="text-4xl font-extrabold">Choose Your Level</h1>
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-r from-purple-800 to-black text-white px-4 sm:px-8 py-10">
+      
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-10 items-center mt-10 sm:mt-20 justify-center">
+      <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-8 sm:mb-12 text-center">
+        Choose Your Level
+      </h1>
+
+      <div className="flex flex-wrap gap-5 sm:gap-8 justify-center w-full max-w-3xl cursor-pointer">
         {levels.map((level, index) => (
           <motion.button
             key={index}
-            className={`${level.color} px-8 py-4 text-2xl font-bold rounded-lg shadow-lg hover:scale-110 transition transform duration-300`}
+            className={`w-full sm:w-60 ${level.color} text-white px-8 py-4 text-lg sm:text-xl font-semibold rounded-xl shadow-xl hover:brightness-110 focus:outline-none focus:ring-4 focus:ring-white/50 transition-all duration-300`}
             onClick={() => navigate(level.route)}
-            whileHover={{ scale: 1.2 }}
-            whileTap={{ scale: 0.9 }}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.95 }}
           >
             {level.name}
           </motion.button>
