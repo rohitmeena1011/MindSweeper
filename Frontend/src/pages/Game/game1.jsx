@@ -15,10 +15,7 @@ const Game1 = () => {
   const [attemptsLeft, setAttemptsLeft] = useState(0);
 
   useEffect(() => {
-    // Randomly set length between 4 to 12
-    const randomLength = Math.floor(Math.random() * 9) + 4;
-    navigate(`/game1/${randomLength}`);
-    fetchGameData(randomLength);
+    fetchGameData(6);
   }, []);
 
   const fetchGameData = async (length) => {

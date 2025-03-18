@@ -31,7 +31,7 @@ const Dashboard = () => {
 
       <div className="flex flex-col items-center justify-center flex-grow gap-8">
         <button
-          onClick={() => handleGameClick("/game1/3")}
+          onClick={() => handleGameClick("/game1")}
           className="w-64 h-24 flex items-center justify-center text-2xl font-bold text-white bg-blue-500 rounded-2xl shadow-xl uppercase transform transition-all duration-300 hover:scale-110 hover:bg-blue-700"
         >
           Game 1
