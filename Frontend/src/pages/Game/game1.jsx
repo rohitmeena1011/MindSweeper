@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { Button, Card, CardContent, Typography, Grid } from "@mui/material";
 import axios from "axios";
-import { useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const Game1 = () => {
-  const { length } = useParams();
+  const navigate = useNavigate();
   const [gameData, setGameData] = useState(null);
   const [selectedCards, setSelectedCards] = useState([]);
   const [selectedOps, setSelectedOps] = useState([]);
@@ -14,21 +14,14 @@ const Game1 = () => {
   const [error, setError] = useState(null);
   const [attemptsLeft, setAttemptsLeft] = useState(0);
 
-  // Save the game state to localStorage
-  const saveGameState = (state) => {
-    localStorage.setItem("gameState", JSON.stringify(state));
-  };
+  useEffect(() => {
+    // Randomly set length between 4 to 12
+    const randomLength = Math.floor(Math.random() * 9) + 4;
+    navigate(`/game1/${randomLength}`);
+    fetchGameData(randomLength);
+  }, []);
 
-  // Load game state from localStorage if available
-  const loadGameState = () => {
-    const savedState = localStorage.getItem("gameState");
-    if (savedState) {
-      return JSON.parse(savedState);
-    }
-    return null;
-  };
-
-  const fetchGameData = async () => {
+  const fetchGameData = async (length) => {
     try {
       setLoading(true);
       const response = await axios.get(
@@ -43,74 +36,43 @@ const Game1 = () => {
       };
       setGameData(newGameData);
       setAttemptsLeft(response.data.chosenNumbers.length);
-      // Reset selections on new game
       setSelectedCards([]);
       setSelectedOps([]);
       setOngoingResult(null);
-      saveGameState({
-        gameData: newGameData,
-        selectedCards: [],
-        selectedOps: [],
-        attemptsLeft: response.data.chosenNumbers.length,
-      });
+      setMessage("");
       setLoading(false);
     } catch (err) {
-      console.error("Error fetching game data:", err);
       setError("Failed to load game data");
       setLoading(false);
     }
   };
 
-  // On mount, load saved state if available; otherwise, fetch new game data.
-  useEffect(() => {
-    const savedState = loadGameState();
-    if (savedState && savedState.gameData) {
-      setGameData(savedState.gameData);
-      setSelectedCards(savedState.selectedCards);
-      setSelectedOps(savedState.selectedOps);
-      setAttemptsLeft(savedState.attemptsLeft);
-      setLoading(false);
-    } else {
-      fetchGameData();
-    }
-  }, [length]);
-
-  // Save state changes to localStorage
-  useEffect(() => {
-    if (gameData) {
-      saveGameState({ gameData, selectedCards, selectedOps, attemptsLeft });
-    }
-  }, [gameData, selectedCards, selectedOps, attemptsLeft]);
-
   const flipCard = (index) => {
-    if (!gameData.numbers[index].flipped && attemptsLeft > 0) {
-      const newNumbers = gameData.numbers.map((card, i) =>
-        i === index ? { ...card, flipped: true } : card
-      );
-      setGameData({ ...gameData, numbers: newNumbers });
+    if (!gameData || gameData.numbers[index].flipped || attemptsLeft <= 0) return;
 
-      const newSelectedCards = [...selectedCards, newNumbers[index].value];
-      setSelectedCards(newSelectedCards);
-      setAttemptsLeft((prev) => prev - 1);
+    const newNumbers = gameData.numbers.map((card, i) =>
+      i === index ? { ...card, flipped: true } : card
+    );
 
-      // If after flipping a card the expression is complete (more than one card available),
-      // calculate the ongoing result.
-      if (newSelectedCards.length > 1 && newSelectedCards.length === selectedOps.length + 1) {
-        calculateResult(newSelectedCards, selectedOps);
-      }
+    const newSelectedCards = [...selectedCards, newNumbers[index].value];
+    setGameData({ ...gameData, numbers: newNumbers });
+    setSelectedCards(newSelectedCards);
+    setAttemptsLeft((prev) => prev - 1);
+
+    if (newSelectedCards.length === selectedOps.length + 1) {
+      calculateResult(newSelectedCards, selectedOps);
     }
   };
 
   const selectOperator = (op) => {
-    // Only allow selecting an operator if there is a card waiting for an operator
     if (selectedCards.length <= selectedOps.length) {
       setMessage("Select a card first.");
       return;
     }
+
     const newSelectedOps = [...selectedOps, op];
     setSelectedOps(newSelectedOps);
 
-    // Only calculate if the expression is complete (i.e. at least 2 numbers exist)
     if (selectedCards.length > newSelectedOps.length) {
       calculateResult(selectedCards, newSelectedOps);
     }
@@ -122,20 +84,17 @@ const Game1 = () => {
       if (ops[i] === "+") value += cards[i + 1];
       else if (ops[i] === "-") value -= cards[i + 1];
       else if (ops[i] === "*") value *= cards[i + 1];
-      else if (ops[i] === "/" && cards[i + 1] !== 0)
-        value = Math.floor(value / cards[i + 1]);
+      else if (ops[i] === "/" && cards[i + 1] !== 0) value = Math.floor(value / cards[i + 1]);
     }
+
     setOngoingResult(value);
 
-    // Check if the current result meets the target.
     if (cards.length > 1 && value === gameData.target) {
       setMessage("🎉 Correct! Generating a new game...");
-      setTimeout(() => {
-        fetchGameData();
-      }, 2000);
+      setTimeout(() => fetchGameData(gameData.length), 2000);
     } else if (attemptsLeft <= 0) {
       setMessage("❌ Out of attempts! Cards reset.");
-      resetGame();
+      setTimeout(() => resetGame(), 2000);
     } else {
       setMessage("");
     }
@@ -147,10 +106,6 @@ const Game1 = () => {
       flipped: false,
     }));
     setGameData({ ...gameData, numbers: resetNumbers });
-    resetState();
-  };
-
-  const resetState = () => {
     setSelectedCards([]);
     setSelectedOps([]);
     setOngoingResult(null);
@@ -158,8 +113,7 @@ const Game1 = () => {
     setMessage("");
   };
 
-  if (loading)
-    return <Typography variant="h5">Loading game data...</Typography>;
+  if (loading) return <Typography variant="h5">Loading game data...</Typography>;
   if (error)
     return (
       <Typography variant="h5" color="error">
@@ -210,7 +164,6 @@ const Game1 = () => {
             color="primary"
             onClick={() => selectOperator(op)}
             sx={{ margin: "5px" }}
-            // Disable the operator button if no new card is available for an operation.
             disabled={selectedCards.length <= selectedOps.length}
           >
             {op}
@@ -242,13 +195,7 @@ const Game1 = () => {
       </Typography>
 
       {message && (
-        <Typography
-          variant="h6"
-          style={{
-            marginTop: "10px",
-            color: message.includes("Correct") ? "green" : "red",
-          }}
-        >
+        <Typography variant="h6" style={{ marginTop: "10px", color: message.includes("Correct") ? "green" : "red" }}>
           {message}
         </Typography>
       )}
@@ -257,3 +204,4 @@ const Game1 = () => {
 };
 
 export default Game1;
+
