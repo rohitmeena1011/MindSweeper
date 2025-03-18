@@ -7,10 +7,10 @@ const Dashboard = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    const token = localStorage.getItem("authToken"); 
-    setIsAuthenticated(!!token); 
+    const token = localStorage.getItem("authToken");
+    setIsAuthenticated(!!token);
     if (!token) {
-      navigate('/login');
+      navigate("/login");
     }
   }, [navigate]);
 
@@ -24,10 +24,9 @@ const Dashboard = () => {
 
   return (
     <div className="h-screen bg-gray-900 text-white flex flex-col">
-     
-     <div className="typewriter mt-4 text-2xl">
-  <h1>Get Ready To Challenge Your Mind</h1>
-</div>
+      <div className="typewriter mt-4 text-2xl">
+        <h1>Get Ready To Challenge Your Mind</h1>
+      </div>
 
       <div className="flex flex-col items-center justify-center flex-grow gap-8">
         <button
