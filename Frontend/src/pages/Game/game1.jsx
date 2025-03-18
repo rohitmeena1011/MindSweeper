@@ -29,7 +29,7 @@ const Game1 = () => {
     return null;
   };
 
-  const fetchGameData = async () => {
+  const fetchGameData = async (length) => {
     try {
       setLoading(true);
       const response = await axios.get(

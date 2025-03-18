@@ -27,6 +27,18 @@ const Game2 = () => {
   const [initialOperators, setInitialOperators] = useState([]);
   const [message, setMessage] = useState('');
 
+  /*useEffect(()=>{
+    if(gameLength == 7){
+      const newNodes = [...placedNodes];
+      newNodes[1] = availableNumbers[1];
+      setPlacedNodes(newNodes);
+      // Remove only one occurrence.
+      setAvailableNumbers(prev => {
+        const i = prev.indexOf(data.item);
+        return i === -1 ? prev : [...prev.slice(0, i), ...prev.slice(i + 1)];
+      });
+    }
+  },[])*/
   // Function to load a new game (new target and pool) from the API.
   const loadNewGame = () => {
     fetch(`http://localhost:5000/api/generate-game?length=${gameLength}`)
