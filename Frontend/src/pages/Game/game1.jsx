@@ -33,7 +33,7 @@
 //     try {
 //       setLoading(true);
 //       const response = await axios.get(
-//         `http://mind-sweeper-api.vercel.app//api/generate-game?length=${length}`
+//         `https://mind-sweeper-api.vercel.app//api/generate-game?length=${length}`
 //       );
 //       const newGameData = {
 //         ...response.data,
@@ -267,7 +267,7 @@ const Game1 = () => {
     try {
       setLoading(true);
       // We assume length=6 returns 12 cards along with a target
-      const response = await axios.get(`http://mind-sweeper-api.vercel.app//api/generate-game?length=6`);
+      const response = await axios.get(`https://mind-sweeper-api.vercel.app//api/generate-game?length=6`);
       const newGameData = {
         ...response.data,
         numbers: response.data.numbers.map((num) => ({
@@ -383,7 +383,7 @@ const Game1 = () => {
   
     const email = localStorage.getItem('email');
   
-    axios.post('http://mind-sweeper-api.vercel.app//api/update-points', {
+    axios.post('https://mind-sweeper-api.vercel.app//api/update-points', {
       encryptedGameId,
       email_id: email,  
       points: 15
