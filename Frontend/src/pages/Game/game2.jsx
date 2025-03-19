@@ -273,7 +273,7 @@ const Game2 = () => {
   };
 
   return (
-    <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
+    <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif',color: "#2b66c4" }}>
       <h2>Target: {target !== null ? target : 'Loading...'}</h2>
       {message && <h3>{message}</h3>}
 

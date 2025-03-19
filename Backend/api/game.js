@@ -7,7 +7,7 @@ const Game = require("../models/Game");
 const generateGameData = (chosenLength) => {
     let numbers = [];
     for (let i = 0; i < chosenLength * 2; i++) {
-        numbers.push(Math.floor(Math.random() * 20) + 1);
+        numbers.push(Math.floor(Math.random() * 35) + 1);
     }
 
     let target = 0;

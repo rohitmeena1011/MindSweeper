@@ -8,14 +8,15 @@ function Rules() {
       <br />
       <h2 className="text-xl font-semibold mt-2 text-white">Objective</h2>
       <p className="mb-2 text-white">
-        ?Name? has played the famous JUMANJI game and has received a challenge
+        Alan has played the famous JUMANJI game and has received a challenge
         during the course of the game. As he is very lazy and weak at
         mathematics, he requires your help to resolve the challenges and
         complete the gaming adventure.
       </p>
 
       <h2 className="text-xl font-semibold mt-2">Gameplay</h2>
-      <p className="mb-2 text-white">Card Game
+      <h2 className="text-xl font-semibold mt-2 text-white">Card Game</h2>
+      <p className="mb-2 text-white">
         You are given 6 blank sections for operands and 5 for operators.
         You are given 6 × 2 = 12 cards with numbers visible on them.
         Choose an empty section and then choose a card. 
@@ -29,7 +30,9 @@ function Rules() {
         Else, they lose and have to play again.
        </p>
        <br />
-       <p className="mb-2 text-white">“Path and Pool”
+       
+      <h2 className="text-xl font-semibold mt-2 text-white">Path and Pool</h2>
+       <p className="mb-2 text-white">
             You are given a pool of operands and operators. 
             You’re also given a target number to achieve.
             You need to use the operators and operands in correct sequence to achieve the target.
