@@ -230,7 +230,7 @@ const Game1 = () => {
                 alignItems: "center",
                 justifyContent: "center",
                 backgroundColor: card.used ? "#ccc" : "#1976d2",
-                color: card.used ? "black" : "white",
+                color:  "white",
                 fontSize: 24,
                 borderRadius: "8px",
                 boxShadow: "0 4px 8px rgba(0,0,0,0.2)",
