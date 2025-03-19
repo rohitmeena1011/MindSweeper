@@ -9,15 +9,16 @@ import Game1 from './pages/Game/game1';
 import Game2 from './pages/Game/game2';
 import Game2choose from './pages/Game/game2choose';
 import Navbar from './components/Navbar';
+import Rules from './pages/Rules/rules';
 function App() {
   return (
     <>
   <Router>
-    <Navbar />
+    <Navbar/>
     <Routes>
       <Route path="/" element={<Dashboard/>} />
       <Route path="/login" element={<AuthForm />} />
-  
+      <Route path="/rules" element={<Rules/>}/>
       <Route path="/leaderboard" element={<Leaderboard />} />
       <Route path="/game1" element={<Game1/>} />
       <Route path="/game2/:length" element={<Game2 />} />
