@@ -11,7 +11,7 @@ const app = express();
 
 app.use(express.json());
 app.use(cors({
-  origin: "https://mind-sweeper-api.vercel.app/",
+  origin: "https://mind-sweeper-frontend.vercel.app/",
   methods: ["POST","GET"],
   credentials: true,
 }));
