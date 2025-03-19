@@ -26,7 +26,9 @@ router.post("/update-points", async (req, res) => {
     }
 
     // Verify if the game ID exists in the database
-    const game = await Game.findById(decryptedGameId);
+    const game = await Game.findOne(
+      {id:decryptedGameId}
+    );
     if (!game) {
       return res.status(404).json({ error: "Game ID not found" });
     }
@@ -43,7 +45,9 @@ router.post("/update-points", async (req, res) => {
     }
 
     // Delete the game entry from the database
-    // await Game.findByIdAndDelete(decryptedGameId);
+    await Game.findOneAndDelete(
+      {id:decryptedGameId}
+    );
 
     res.json({
       message: "Points updated successfully, game deleted",
