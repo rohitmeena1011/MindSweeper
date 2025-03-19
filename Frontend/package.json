@@ -19,10 +19,10 @@
     "axios": "^1.8.3",
     "crypto-js": "^4.2.0",
     "framer-motion": "^12.5.0",
-    "react": "^19.0.0",
+    "react": "^18.0.0",
     "react-dnd": "^16.0.1",
     "react-dnd-html5-backend": "^16.0.1",
-    "react-dom": "^19.0.0",
+    "react-dom": "^18.0.0",
     "react-loader-spinner": "^6.1.6",
     "react-router-dom": "^7.3.0",
     "tailwindcss": "^4.0.14"

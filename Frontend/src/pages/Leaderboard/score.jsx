@@ -1,5 +1,5 @@
 import React from "react";
-import "./Score.css";
+import "./score.css";
 
 const Score = ({ rank, name, score, className }) => (
   <div className={`score ${className}`}>
