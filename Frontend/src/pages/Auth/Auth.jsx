@@ -137,7 +137,7 @@ const AuthForm = () => {
       const data = await response.json();
 
       if (response.ok) {
-        login(data.token);
+        login({token: data.token, email: email});
         navigate("/");
       } else {
         console.error("Authentication failed:", data.message);

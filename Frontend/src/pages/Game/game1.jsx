@@ -242,6 +242,7 @@
 import React, { useState, useEffect } from "react";
 import { Button, Card, CardContent, Typography, Grid, Box } from "@mui/material";
 import axios from "axios";
+import CryptoJS from 'crypto-js';
 
 const Game1 = () => {
   const [gameData, setGameData] = useState(null);
@@ -254,6 +255,7 @@ const Game1 = () => {
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [currGameId,setCurrGameId] = useState('');
 
   // Fetch game data on mount (assumes API returns 12 numbers and a target)
   useEffect(() => {
@@ -273,9 +275,11 @@ const Game1 = () => {
           used: false,
         })),
       };
+      const gameId = newGameData.gameId;
       setGameData(newGameData);
       resetSelections();
       setMessage("");
+      setCurrGameId(gameId);
       setLoading(false);
     } catch (err) {
       setError("Failed to load game data");
@@ -370,6 +374,27 @@ const Game1 = () => {
     return result;
   };
 
+  const addPoints = () => {
+    const gameId = JSON.stringify(currGameId);
+    const secretKey = 'Z8yd9sfG9h1r3f9$jb0vXp!92mbR6hFz';
+    console.log(gameId)
+  
+    const encryptedGameId = CryptoJS.AES.encrypt(gameId, secretKey).toString();
+  
+    const email = localStorage.getItem('email');
+  
+    axios.post('http://localhost:5000/api/update-points', {
+      encryptedGameId,
+      email_id: email,  
+      points: 15
+    })
+    .then(response => {
+      console.log('Points updated successfully:', response.data);
+    })
+    .catch(err => {
+      console.error("Error updating points:", err);
+    });
+  };
   // Update the running result whenever selections change.
   useEffect(() => {
     if (!gameData) return;
@@ -379,7 +404,8 @@ const Game1 = () => {
   
     // ✅ Let them win if they get the target on or before the 6th move
     if (movesCount >= 3 && movesCount <= 6 && result === gameData.target) {
-      setMessage(`🎉 Correct in ${movesCount} moves! 100 points added.`);
+      setMessage(`🎉 Correct in ${movesCount} moves! 15 points added.`);
+      addPoints();
       setScore((prev) => prev + 100);
       setTimeout(() => {
         fetchGameData();

@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import CryptoJS from 'crypto-js';
+import axios from 'axios';
 
 // Utility function to reshuffle an array using Fisher-Yates.
 const shuffleArray = (array) => {
@@ -26,57 +28,104 @@ const Game2 = () => {
   const [initialNumbers, setInitialNumbers] = useState([]);
   const [initialOperators, setInitialOperators] = useState([]);
   const [message, setMessage] = useState('');
+  const [currGameId,setCurrGameId] = useState('');
 
-  /*useEffect(()=>{
-    if(gameLength == 7){
-      const newNodes = [...placedNodes];
-      newNodes[1] = availableNumbers[1];
-      setPlacedNodes(newNodes);
-      // Remove only one occurrence.
-      setAvailableNumbers(prev => {
-        const i = prev.indexOf(data.item);
-        return i === -1 ? prev : [...prev.slice(0, i), ...prev.slice(i + 1)];
-      });
-    }
-  },[])*/
-  // Function to load a new game (new target and pool) from the API.
   const loadNewGame = () => {
     fetch(`http://localhost:5000/api/generate-game?length=${gameLength}`)
       .then(response => response.json())
       .then(data => {
         // API returns: { target, chosenNumbers, operatorPool }
-        const shuffledNumbers = shuffleArray(data.chosenNumbers);
-        const shuffledOperators = shuffleArray(data.operatorPool);
+  
+        // Shuffle the arrays
+        const initialNumbers = data.chosenNumbers;
+        const initialOperators = data.operatorPool;
+        const gameId = data.gameId;
+        let Numbers = initialNumbers;
+        let Operators = initialOperators;
+  
+        // Select placed nodes and edges
+        const placedNodes = Array(Numbers.length).fill(null);
+        const placedEdges = Array(Operators.length).fill(null);
+  
+        if(Numbers.length > 3){
+          // Set values at specific indices
+          placedNodes[1] = Numbers[1];
+          placedNodes[3] = Numbers[3];
+          placedEdges[2] = Operators[2];
+        
+
+        if(Numbers.length > 5){
+          placedNodes[6] = Numbers[6];
+          placedEdges[4] = Operators[4];
+        }
+  
+        // Remove the placed nodes and edges from the arrays
+        Numbers = Numbers.filter((_, index) => index !== 1 && index !== 3 && index !== 6);
+        Operators = Operators.filter((_, index) => index !== 2 && index !== 4);
+        }
+  
+        // Update the state with the newly modified values
         setTarget(data.target);
-        setAvailableNumbers(shuffledNumbers);
-        setAvailableOperators(shuffledOperators);
-        setInitialNumbers(shuffledNumbers);
-        setInitialOperators(shuffledOperators);
-        setPlacedNodes(Array(shuffledNumbers.length).fill(null));
-        setPlacedEdges(Array(shuffledOperators.length).fill(null));
+        setAvailableNumbers(shuffleArray(Numbers)); // Updated list of numbers
+        setAvailableOperators(shuffleArray(Operators)); // Updated list of operators
+        setInitialNumbers(shuffleArray(Numbers));
+        setInitialOperators(shuffleArray(Operators));
+        setPlacedNodes(placedNodes);
+        setPlacedEdges(placedEdges);
+        setCurrGameId(gameId);
+  
         // Save to localStorage for persistence.
         localStorage.setItem(localStorageKey, JSON.stringify({
           target: data.target,
-          initialNumbers: shuffledNumbers,
-          initialOperators: shuffledOperators
+          initialNumbers: initialNumbers,
+          initialOperators: initialOperators,
+          gameId: gameId
         }));
+  
         setMessage('');
       })
       .catch(err => console.error("Error fetching new game data:", err));
   };
+  
 
   useEffect(() => {
     
     const savedData = localStorage.getItem(localStorageKey);
     if (savedData) {
       const parsed = JSON.parse(savedData);
+      let Numbers = parsed.initialNumbers;
+      let Operators = parsed.initialOperators;
+
+      // Select placed nodes and edges
+      const placedNodes = Array(Numbers.length).fill(null);
+      const placedEdges = Array(Operators.length).fill(null);
+
+      if(Numbers.length > 3){
+        // Set values at specific indices
+        placedNodes[1] = Numbers[1];
+        placedNodes[3] = Numbers[3];
+        placedEdges[2] = Operators[2];
+      
+
+      if(Numbers.length > 5){
+        placedNodes[6] = Numbers[6];
+        placedEdges[4] = Operators[4];
+      }
+
+      // Remove the placed nodes and edges from the arrays
+      Numbers = Numbers.filter((_, index) => index !== 1 && index !== 3 && index !== 6);
+      Operators = Operators.filter((_, index) => index !== 2 && index !== 4);
+      }
+
+      // Update the state with the newly modified values
       setTarget(parsed.target);
-      setAvailableNumbers(parsed.initialNumbers);
-      setAvailableOperators(parsed.initialOperators);
-      setInitialNumbers(parsed.initialNumbers);
-      setInitialOperators(parsed.initialOperators);
-      setPlacedNodes(Array(parsed.initialNumbers.length).fill(null));
-      setPlacedEdges(Array(parsed.initialOperators.length).fill(null));
+      setAvailableNumbers(shuffleArray(Numbers)); // Updated list of numbers
+      setAvailableOperators(shuffleArray(Operators)); // Updated list of operators
+      setInitialNumbers(shuffleArray(Numbers));
+      setInitialOperators(shuffleArray(Operators));
+      setPlacedNodes(placedNodes);
+      setPlacedEdges(placedEdges);
+      setCurrGameId(parsed.gameId)
     } else {
       // Otherwise, fetch new game data.
       loadNewGame();
@@ -141,13 +190,34 @@ const Game2 = () => {
     return result;
   };
 
-  // Check if the board is fully filled and if the result matches the target.
+  const addPoints = () => {
+    const gameId = JSON.stringify(currGameId);
+    const secretKey = 'Z8yd9sfG9h1r3f9$jb0vXp!92mbR6hFz';
+    console.log(gameId)
+  
+    const encryptedGameId = CryptoJS.AES.encrypt(gameId, secretKey).toString();
+  
+    const email = localStorage.getItem('email');
+  
+    axios.post('http://localhost:5000/api/update-points', {
+      encryptedGameId,
+      email_id: email,  
+      points: gameLength === 3 ? 2 : gameLength === 5 ? 5 : gameLength === 7 ? 10 : 0
+    })
+    .then(response => {
+      console.log('Points updated successfully:', response.data);
+    })
+    .catch(err => {
+      console.error("Error updating points:", err);
+    });
+  };
+
   const checkBoardComplete = (nodes, edges) => {
     if (nodes.every(val => val !== null) && edges.every(val => val !== null)) {
       const finalResult = computeResult(nodes, edges);
       if (finalResult === target) {
         setMessage("Congratulations! Correct result achieved. Loading new game...");
-        // After a short delay, load a new game.
+        addPoints()
         setTimeout(() => {
           loadNewGame();
         }, 2000);

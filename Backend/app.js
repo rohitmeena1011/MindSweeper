@@ -25,5 +25,8 @@ app.use("/api", gameRoutes);
 const pointRoutes = require("./api/points.js");
 app.use("/api",pointRoutes);
 
+const leaderBoardRoutes = require('./api/leaderBoard.js');
+app.use("/api",leaderBoardRoutes)
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

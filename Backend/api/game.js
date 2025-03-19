@@ -7,13 +7,14 @@ const Game = require("../models/Game");
 const generateGameData = (chosenLength) => {
     let numbers = [];
     for (let i = 0; i < chosenLength * 2; i++) {
-        numbers.push(Math.floor(Math.random() * 40) + 1);
+        numbers.push(Math.floor(Math.random() * 20) + 1);
     }
 
     let target = 0;
     let operators = ["+", "-", "*", "/"];
     let chosenNumbers = [];
     let operatorPool = [];
+    let usedMultiplication = false;
 
     // Select the first number
     let j = Math.floor(Math.random() * numbers.length);
@@ -32,20 +33,33 @@ const generateGameData = (chosenLength) => {
         let number = numbers[j];
         let operator = operators[Math.floor(Math.random() * 4)];
 
+        if (usedMultiplication && operator === "*") {
+            operator = "-";
+        }
+
         // Check if applying the operation keeps target in bounds
         let newTarget = target;
         if (operator === "+") newTarget += number;
-        else if (operator === "-") newTarget -= number;
-        else if (operator === "*") newTarget *= number;
-        else if (operator === "/" && number !== 0 && target % number === 0) newTarget = Math.floor(target / number);
+        else if (operator === "-") {
+            // If subtraction results in a negative target, use addition instead
+            if (newTarget - number < 0) {
+                operator = "+";
+                newTarget = newTarget + number; // Apply addition instead
+            } else {
+                newTarget -= number;
+            }
+        }
+        else if (operator === "*") {
+            newTarget *= number;
+            usedMultiplication = true;
+        }
+        else if (operator === "/") newTarget = Math.floor(newTarget/number);
         else continue; // Skip invalid division cases
 
-        if (newTarget >= 0 && newTarget <= 200) {
-            target = newTarget;
-            chosenNumbers.push(number);
-            operatorPool.push(operator);
-            numbers.splice(j, 1);
-        }
+        target = newTarget;
+        chosenNumbers.push(number);
+        operatorPool.push(operator);
+        numbers.splice(j, 1);
     }
 
     numbers.push(...chosenNumbers);

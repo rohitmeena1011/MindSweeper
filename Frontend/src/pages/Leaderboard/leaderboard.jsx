@@ -17,9 +17,18 @@ const Leaderboard = () => {
     { name: "Eve", points: 800},
   ];
 
+  const getLeaderBoard = () =>{
+    fetch(`http://localhost:5000/api/leaderboard`)
+      .then(response => response.json())
+      .then(data => {
+        console.log(data)
+        setLeaderboard(data.leaderboard)})
+      .catch(err => console.error("Error fetching new game data:", err));
+  };
+
   useEffect(() => {
     setTimeout(() => {
-      setLeaderboard(testData);
+      getLeaderBoard();
       setLoading(false);
     }, 1000);
   }, []);
@@ -67,7 +76,7 @@ const Leaderboard = () => {
                     ? "third-place"
                     : ""
                 }`}
-                name={elem.name}
+                name={elem.username}
                 score={elem.points}
                 
                 rank={index + 1}
