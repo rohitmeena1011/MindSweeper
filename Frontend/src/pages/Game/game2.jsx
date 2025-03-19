@@ -31,7 +31,7 @@ const Game2 = () => {
   const [currGameId,setCurrGameId] = useState('');
 
   const loadNewGame = () => {
-    fetch(`http://localhost:5000/api/generate-game?length=${gameLength}`)
+    fetch(`http://mind-sweeper-api.vercel.app//api/generate-game?length=${gameLength}`)
       .then(response => response.json())
       .then(data => {
         // API returns: { target, chosenNumbers, operatorPool }
@@ -199,7 +199,7 @@ const Game2 = () => {
   
     const email = localStorage.getItem('email');
   
-    axios.post('http://localhost:5000/api/update-points', {
+    axios.post('http://mind-sweeper-api.vercel.app//api/update-points', {
       encryptedGameId,
       email_id: email,  
       points: gameLength === 3 ? 2 : gameLength === 5 ? 5 : gameLength === 7 ? 10 : 0

@@ -12,7 +12,7 @@
 
 //   const handleSubmit = async (e) => {
 //     e.preventDefault();
-//     const endpoint = isSignUp ? "http://localhost:5000/api/auth/signup" : "http://localhost:5000/api/auth/login";
+//     const endpoint = isSignUp ? "http://mind-sweeper-api.vercel.app//api/auth/signup" : "http://mind-sweeper-api.vercel.app//api/auth/login";
 
 //     try {
 //       const response = await fetch(endpoint, {
@@ -124,8 +124,8 @@ const AuthForm = () => {
     }
 
     const endpoint = isSignUp
-      ? "http://localhost:5000/api/auth/signup"
-      : "http://localhost:5000/api/auth/login";
+      ? "http://mind-sweeper-api.vercel.app//api/auth/signup"
+      : "http://mind-sweeper-api.vercel.app//api/auth/login";
 
     try {
       const response = await fetch(endpoint, {

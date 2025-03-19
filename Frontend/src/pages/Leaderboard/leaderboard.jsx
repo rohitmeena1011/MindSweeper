@@ -18,7 +18,7 @@ const Leaderboard = () => {
   ];
 
   const getLeaderBoard = () =>{
-    fetch(`http://localhost:5000/api/leaderboard`)
+    fetch(`http://mind-sweeper-api.vercel.app//api/leaderboard`)
       .then(response => response.json())
       .then(data => {
         console.log(data)

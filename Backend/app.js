@@ -17,6 +17,11 @@ mongoose
   .then(() => console.log("MongoDB Connected"))
   .catch((err) => console.error(err));
 
+
+app.get("/", (req, res) => {
+  res.send("API is working!");
+});
+  
 app.use("/api/auth", authRoutes);
 
 const gameRoutes = require("./api/game");
