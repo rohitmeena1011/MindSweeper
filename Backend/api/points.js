@@ -52,7 +52,7 @@ router.post("/update-points", async (req, res) => {
     });
   } catch (error) {
     console.error("Error updating points:", error);
-    res.status(500).json({ error: "Internal server error" });
+    res.status(500).json({ error: error });
   }
 });
 
