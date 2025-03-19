@@ -136,7 +136,6 @@ const Game1 = () => {
   const addPoints = () => {
     const gameId = JSON.stringify(currGameId);
     const secretKey = 'Z8yd9sfG9h1r3f9$jb0vXp!92mbR6hFz';
-    console.log(gameId);
   
     const encryptedGameId = CryptoJS.AES.encrypt(gameId, secretKey).toString();
   
@@ -148,7 +147,6 @@ const Game1 = () => {
       points: 15
     })
     .then(response => {
-      console.log('Points updated successfully:', response.data);
     })
     .catch(err => {
       console.error("Error updating points:", err);

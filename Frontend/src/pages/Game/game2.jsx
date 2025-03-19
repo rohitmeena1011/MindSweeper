@@ -161,11 +161,13 @@ const Game2 = () => {
   };
 
   const placeNumber = (number) => {
-    console.log(number);
     if(selectedType != 'node'){
       return;
     }
     const newNodes = [...placedNodes];
+    if(newNodes[selectedIndex] != null){
+      return;
+    }
     newNodes[selectedIndex] = number;
     setPlacedNodes(newNodes);
     // Remove only one occurrence.
@@ -177,11 +179,13 @@ const Game2 = () => {
   }
 
   const placeOperator = (operator) => {
-    console.log(operator);
     if(selectedType != 'edge'){
       return;
     }
     const newEdges = [...placedEdges];
+    if(newEdges[selectedIndex] != null){
+      return;
+    }
     newEdges[selectedIndex] = operator;
     setPlacedEdges(newEdges);
     // Remove only one occurrence.
@@ -226,7 +230,6 @@ const Game2 = () => {
   const addPoints = () => {
     const gameId = JSON.stringify(currGameId);
     const secretKey = 'Z8yd9sfG9h1r3f9$jb0vXp!92mbR6hFz';
-    console.log(gameId)
   
     const encryptedGameId = CryptoJS.AES.encrypt(gameId, secretKey).toString();
   
@@ -238,7 +241,6 @@ const Game2 = () => {
       points: gameLength === 3 ? 2 : gameLength === 5 ? 5 : gameLength === 7 ? 10 : 0
     })
     .then(response => {
-      console.log('Points updated successfully:', response.data);
     })
     .catch(err => {
       console.error("Error updating points:", err);
