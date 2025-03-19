@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const CryptoJS = require("crypto-js");
 const User = require("../models/User");
+const Game = require("../models/Game"); // Assuming a Game model exists
 
 // Secret key used for encryption/decryption
 const secretKey = 'Z8yd9sfG9h1r3f9$jb0vXp!92mbR6hFz';
@@ -24,6 +25,12 @@ router.post("/update-points", async (req, res) => {
       return res.status(400).json({ error: "Decryption failed" });
     }
 
+    // Verify if the game ID exists in the database
+    const game = await Game.findById(decryptedGameId);
+    if (!game) {
+      return res.status(404).json({ error: "Game ID not found" });
+    }
+
     // Find the user and update points
     const user = await User.findOneAndUpdate(
       { email: email_id }, // Find user by email
@@ -35,10 +42,13 @@ router.post("/update-points", async (req, res) => {
       return res.status(404).json({ error: "User not found" });
     }
 
+    // Delete the game entry from the database
+    await Game.findByIdAndDelete(decryptedGameId);
+
     res.json({
-      message: "Points updated successfully",
+      message: "Points updated successfully, game deleted",
       user,
-      decryptedGameId,  // Optionally send back decrypted game ID for verification
+      decryptedGameId,
     });
   } catch (error) {
     console.error("Error updating points:", error);

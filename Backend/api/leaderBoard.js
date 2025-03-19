@@ -8,7 +8,6 @@ router.get('/leaderboard', async (req, res) => {
     // Fetch the users, sorted by points in descending order
     const leaderboard = await User.find()
       .sort({ points: -1 })  // Sort by points in descending order
-      .limit(10); // Limit to the top 10 users (optional, can be removed for the full list)
 
     // Send the leaderboard as the response
     res.status(200).json({
