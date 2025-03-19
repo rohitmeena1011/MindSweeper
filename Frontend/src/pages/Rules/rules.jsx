@@ -35,11 +35,6 @@ function Rules() {
             You need to use the operators and operands in correct sequence to achieve the target.
        </p>
     <br />
-      <h2 className="text-xl font-semibold mt-2 text-white">Scoring</h2>
-      <p className="mb-2 text-white">You earn points by ...</p>
-    <br />
-      <h2 className="text-xl font-semibold mt-2 text-white">Tips</h2>
-      <p>Some helpful tips to keep in mind ...</p>
     </div>
   );
 }
