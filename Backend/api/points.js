@@ -43,7 +43,7 @@ router.post("/update-points", async (req, res) => {
     }
 
     // Delete the game entry from the database
-    await Game.findByIdAndDelete(decryptedGameId);
+    // await Game.findByIdAndDelete(decryptedGameId);
 
     res.json({
       message: "Points updated successfully, game deleted",
