@@ -29,6 +29,8 @@ const Game2 = () => {
   const [initialOperators, setInitialOperators] = useState([]);
   const [message, setMessage] = useState('');
   const [currGameId,setCurrGameId] = useState('');
+  const [selectedIndex, setSelectedIndex] = useState(null);
+  const [selectedType, setSelectedType] = useState(null);
 
   const loadNewGame = () => {
     fetch(`https://mindsweeper-api.onrender.com/api/generate-game?length=${gameLength}`)
@@ -158,6 +160,37 @@ const Game2 = () => {
     checkBoardComplete(newNodes, placedEdges);
   };
 
+  const placeNumber = (number) => {
+    console.log(number);
+    if(selectedType != 'node'){
+      return;
+    }
+    const newNodes = [...placedNodes];
+    newNodes[selectedIndex] = number;
+    setPlacedNodes(newNodes);
+    // Remove only one occurrence.
+    setAvailableNumbers(prev => {
+      const i = prev.indexOf(number);
+      return i === -1 ? prev : [...prev.slice(0, i), ...prev.slice(i + 1)];
+    });
+    checkBoardComplete(newNodes, placedEdges);
+  }
+
+  const placeOperator = (operator) => {
+    console.log(operator);
+    if(selectedType != 'edge'){
+      return;
+    }
+    const newEdges = [...placedEdges];
+    newEdges[selectedIndex] = operator;
+    setPlacedEdges(newEdges);
+    // Remove only one occurrence.
+    setAvailableOperators(prev => {
+      const i = prev.indexOf(operator);
+      return i === -1 ? prev : [...prev.slice(0, i), ...prev.slice(i + 1)];
+    });
+    checkBoardComplete(placedNodes, newEdges);
+  }
   // Drop handler for operator edges.
   const onDropEdge = (e, index) => {
     e.preventDefault();
@@ -263,38 +296,48 @@ const Game2 = () => {
         <div
           onDrop={(e) => onDropNode(e, index)}
           onDragOver={allowDrop}
+          onClick={() => {
+            setSelectedIndex(index);
+            setSelectedType('node');
+          }}
           style={{
             width: '60px',
             height: '60px',
             borderRadius: '50%',
-            border: '2px solid #333',
+            border: selectedIndex === index && selectedType === 'node' ? '3px solid red' : '2px solid #333',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             margin: '5px',
-            backgroundColor: index === 0 ? '#d4f7d4' : '#fff',
+            backgroundColor: '#fff',
             fontSize: '18px',
             fontWeight: 'bold',
             color: '#333',
+            cursor: 'pointer',
           }}
         >
-          {node !== null ? node : index === 0 ? 'Start' : ''}
+          {node !== null ? node : ''}
         </div>
         {/* Edge as a squared diamond */}
         {index < placedEdges.length && (
           <div
             onDrop={(e) => onDropEdge(e, index)}
             onDragOver={allowDrop}
+            onClick={() => {
+              setSelectedIndex(index);
+              setSelectedType('edge');
+            }}
             style={{
               width: '50px',
               height: '50px',
-              border: '2px solid #007bff',
+              border: selectedIndex === index && selectedType === 'edge' ? '3px solid red' : '2px solid #333',
               backgroundColor: '#f0f8ff',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               margin: '5px',
               transform: 'rotate(45deg)',
+              cursor: 'pointer',
             }}
           >
             <div
@@ -321,8 +364,7 @@ const Game2 = () => {
           {availableNumbers.map((num, idx) => (
             <div
               key={`num-${idx}`}
-              draggable
-              onDragStart={(e) => onDragStart(e, num, "number")}
+              onClick={(e)=>placeNumber(num)}
               style={{
                 width: '50px',
                 height: '50px',
@@ -336,7 +378,6 @@ const Game2 = () => {
                 fontSize: '18px',
                 fontWeight: 'bold',
                 color: '#333',
-                cursor: 'grab'
               }}
             >
               {num}
@@ -352,8 +393,7 @@ const Game2 = () => {
           {availableOperators.map((op, idx) => (
             <div
               key={`op-${idx}`}
-              draggable
-              onDragStart={(e) => onDragStart(e, op, "operator")}
+              onClick={(e)=> placeOperator(op)}
               style={{
                 width: '50px',
                 height: '50px',
@@ -366,7 +406,6 @@ const Game2 = () => {
                 fontSize: '24px',
                 fontWeight: 'bold',
                 color: '#007bff',
-                cursor: 'grab'
               }}
             >
               {op}
