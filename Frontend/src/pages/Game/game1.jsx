@@ -230,7 +230,7 @@ const Game1 = () => {
                 alignItems: "center",
                 justifyContent: "center",
                 backgroundColor: card.used ? "#ccc" : "#1976d2",
-                color:  "white",
+                color: card.used ? "black" : "white",
                 fontSize: 24,
                 borderRadius: "8px",
                 boxShadow: "0 4px 8px rgba(0,0,0,0.2)",
@@ -259,6 +259,7 @@ const Game1 = () => {
                 alignItems: "center",
                 justifyContent: "center",
                 cursor: num === null ? "pointer" : "default",
+                color: "white",
               }}
             >
               <Typography variant="h5">{num !== null ? num : ""}</Typography>
@@ -273,6 +274,7 @@ const Game1 = () => {
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
+                  color: "white",
                 }}
               >
                 <Typography variant="h5">
