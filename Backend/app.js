@@ -10,11 +10,7 @@ dotenv.config();
 const app = express();
 
 app.use(express.json());
-app.use(cors({
-  origin: "https://mind-sweeper-frontend.vercel.app/",
-  methods: ["POST","GET"],
-  allowedHeaders: "Content-Type,Authorization"
-}));
+app.use(cors());
 
 mongoose
   .connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
