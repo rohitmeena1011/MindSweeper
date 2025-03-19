@@ -246,7 +246,7 @@ import CryptoJS from 'crypto-js';
 
 const Game1 = () => {
   const [gameData, setGameData] = useState(null);
-  // Reserve 6 slots for numbers (moves) and 5 for operators
+  // Reserve 6 slots for numbers (operands) and 5 for operators
   const [selectedNumbers, setSelectedNumbers] = useState(Array(6).fill(null));
   const [selectedOperators, setSelectedOperators] = useState(Array(5).fill(null));
   const [activeSlot, setActiveSlot] = useState(null); // currently selected number slot index
@@ -255,7 +255,7 @@ const Game1 = () => {
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [currGameId,setCurrGameId] = useState('');
+  const [currGameId, setCurrGameId] = useState('');
 
   // Fetch game data on mount (assumes API returns 12 numbers and a target)
   useEffect(() => {
@@ -377,7 +377,7 @@ const Game1 = () => {
   const addPoints = () => {
     const gameId = JSON.stringify(currGameId);
     const secretKey = 'Z8yd9sfG9h1r3f9$jb0vXp!92mbR6hFz';
-    console.log(gameId)
+    console.log(gameId);
   
     const encryptedGameId = CryptoJS.AES.encrypt(gameId, secretKey).toString();
   
@@ -395,24 +395,34 @@ const Game1 = () => {
       console.error("Error updating points:", err);
     });
   };
+
   // Update the running result whenever selections change.
   useEffect(() => {
     if (!gameData) return;
     const result = computeRunningResult();
     setRunningResult(result);
-    const movesCount = selectedNumbers.filter((num) => num !== null).length;
+    const filledNumbersCount = selectedNumbers.filter((num) => num !== null).length;
+    const filledOperatorsCount = selectedOperators.filter((op) => op !== null).length;
   
-    // ✅ Let them win if they get the target on or before the 6th move
-    if (movesCount >= 3 && movesCount <= 6 && result === gameData.target) {
-      setMessage(`🎉 Correct in ${movesCount} moves! 15 points added.`);
+    // The winning condition:
+    // - Moves (filled numbers) should be at least 3 and at most 6,
+    // - The running result equals the target, and
+    // - The difference (operands - operators) equals 1.
+    if (
+      filledNumbersCount >= 3 &&
+      filledNumbersCount <= 6 &&
+      result === gameData.target &&
+      (filledNumbersCount - filledOperatorsCount === 1)
+    ) {
+      setMessage(`🎉 Correct in ${filledNumbersCount} moves! 15 points added.`);
       addPoints();
       setScore((prev) => prev + 100);
       setTimeout(() => {
         fetchGameData();
       }, 2000);
-  
-    // ❌ If it’s the 6th move and the user still hasn't hit the target, reset
-    } else if (movesCount === 6 && result !== gameData.target) {
+    }
+    // If it’s the 6th move and either the result doesn't match or the slots difference isn't 1, reset
+    else if (filledNumbersCount === 6 && (result !== gameData.target || (filledNumbersCount - filledOperatorsCount !== 1))) {
       setMessage("❌ Incorrect in 6 moves. Resetting game.");
       setTimeout(() => {
         resetGame();
@@ -420,9 +430,8 @@ const Game1 = () => {
     }
   }, [selectedNumbers, selectedOperators, gameData]);
 
-  // Determine the moves count
+  // Determine the moves count (number of filled number slots)
   const movesCount = selectedNumbers.filter((num) => num !== null).length;
-
   // Determine the color for the running result
   const runningResultColor =
     runningResult === gameData?.target
@@ -558,6 +567,7 @@ const Game1 = () => {
 };
 
 export default Game1;
+
 
 
 
