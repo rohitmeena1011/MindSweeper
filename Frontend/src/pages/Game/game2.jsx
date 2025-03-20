@@ -31,63 +31,65 @@ const Game2 = () => {
   const [currGameId,setCurrGameId] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(null);
   const [selectedType, setSelectedType] = useState(null);
+  const secretKey = 'Z8yd9sfG9h1r3f9$jb0vXp!92mbR6hFz';
 
   const loadNewGame = () => {
     fetch(`https://mindsweeper-api.onrender.com/api/generate-game?length=${gameLength}`)
-      .then(response => response.json())
-      .then(data => {
-        // API returns: { target, chosenNumbers, operatorPool }
-  
-        // Shuffle the arrays
-        const initialNumbers = data.chosenNumbers;
-        const initialOperators = data.operatorPool;
-        const gameId = data.gameId;
-        let Numbers = initialNumbers;
-        let Operators = initialOperators;
-  
-        // Select placed nodes and edges
-        const placedNodes = Array(Numbers.length).fill(null);
-        const placedEdges = Array(Operators.length).fill(null);
-  
-        if(Numbers.length > 3){
-          // Set values at specific indices
-          placedNodes[1] = Numbers[1];
-          placedNodes[3] = Numbers[3];
-          placedEdges[2] = Operators[2];
-        
+        .then(response => response.json())
+        .then(data => {
+            // Decrypt the encrypted response
+            const decryptedData = CryptoJS.AES.decrypt(data.encryptedData, SECRET_KEY).toString(CryptoJS.enc.Utf8);
+            const gameData = JSON.parse(decryptedData); // Parse JSON after decryption
 
-        if(Numbers.length > 5){
-          placedNodes[6] = Numbers[6];
-          placedEdges[4] = Operators[4];
-        }
-  
-        // Remove the placed nodes and edges from the arrays
-        Numbers = Numbers.filter((_, index) => index !== 1 && index !== 3 && index !== 6);
-        Operators = Operators.filter((_, index) => index !== 2 && index !== 4);
-        }
-  
-        // Update the state with the newly modified values
-        setTarget(data.target);
-        setAvailableNumbers(shuffleArray(Numbers)); // Updated list of numbers
-        setAvailableOperators(shuffleArray(Operators)); // Updated list of operators
-        setInitialNumbers(shuffleArray(Numbers));
-        setInitialOperators(shuffleArray(Operators));
-        setPlacedNodes(placedNodes);
-        setPlacedEdges(placedEdges);
-        setCurrGameId(gameId);
-  
-        // Save to localStorage for persistence.
-        localStorage.setItem(localStorageKey, JSON.stringify({
-          target: data.target,
-          initialNumbers: initialNumbers,
-          initialOperators: initialOperators,
-          gameId: gameId
-        }));
-  
-        setMessage('');
-      })
-      .catch(err => console.error("Error fetching new game data:", err));
-  };
+            // API returns: { target, chosenNumbers, operatorPool, gameId }
+            const initialNumbers = gameData.chosenNumbers;
+            const initialOperators = gameData.operatorPool;
+            const gameId = gameData.gameId;
+            let Numbers = initialNumbers;
+            let Operators = initialOperators;
+
+            // Select placed nodes and edges
+            const placedNodes = Array(Numbers.length).fill(null);
+            const placedEdges = Array(Operators.length).fill(null);
+
+            if (Numbers.length > 3) {
+                // Set values at specific indices
+                placedNodes[1] = Numbers[1];
+                placedNodes[3] = Numbers[3];
+                placedEdges[2] = Operators[2];
+
+                if (Numbers.length > 5) {
+                    placedNodes[6] = Numbers[6];
+                    placedEdges[4] = Operators[4];
+                }
+
+                // Remove the placed nodes and edges from the arrays
+                Numbers = Numbers.filter((_, index) => index !== 1 && index !== 3 && index !== 6);
+                Operators = Operators.filter((_, index) => index !== 2 && index !== 4);
+            }
+
+            // Update the state with the newly modified values
+            setTarget(gameData.target);
+            setAvailableNumbers(shuffleArray(Numbers)); // Updated list of numbers
+            setAvailableOperators(shuffleArray(Operators)); // Updated list of operators
+            setInitialNumbers(shuffleArray(Numbers));
+            setInitialOperators(shuffleArray(Operators));
+            setPlacedNodes(placedNodes);
+            setPlacedEdges(placedEdges);
+            setCurrGameId(gameId);
+
+            // Save to localStorage for persistence
+            localStorage.setItem(localStorageKey, JSON.stringify({
+                target: gameData.target,
+                initialNumbers: initialNumbers,
+                initialOperators: initialOperators,
+                gameId: gameId
+            }));
+
+            setMessage('');
+        })
+        .catch(err => console.error("Error fetching new game data:", err));
+};
   
 
   useEffect(() => {
@@ -229,7 +231,6 @@ const Game2 = () => {
 
   const addPoints = () => {
     const gameId = JSON.stringify(currGameId);
-    const secretKey = 'Z8yd9sfG9h1r3f9$jb0vXp!92mbR6hFz';
   
     const encryptedGameId = CryptoJS.AES.encrypt(gameId, secretKey).toString();
   

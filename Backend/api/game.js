@@ -2,6 +2,8 @@ const express = require("express");
 const mongoose = require("mongoose");
 const router = express.Router();
 const Game = require("../models/Game");
+const crypto = require("crypto-js"); 
+const SECRET_KEY = "Z8yd9sfG9h1r3f9$jb0vXp!92mbR6hFz"; 
 
 // Function to generate game data
 const generateGameData = (chosenLength) => {
@@ -68,7 +70,6 @@ const generateGameData = (chosenLength) => {
     return { target, numbers, chosenNumbers, operatorPool };
 };
 
-// Route to generate and store game data
 router.get("/generate-game", async (req, res) => {
     try {
         let chosenLength = parseInt(req.query.length) || 2;
@@ -86,12 +87,43 @@ router.get("/generate-game", async (req, res) => {
         // Save to MongoDB
         const savedGame = await game.save();
 
-        // Send response with the stored game details
-        res.json({ gameId: savedGame.id, ...gameData });
+        // Encrypt the response data
+        const jsonData = JSON.stringify({ gameId: savedGame.id, ...gameData });
+        const encryptedData = crypto.AES.encrypt(jsonData, SECRET_KEY).toString();
+
+        // Send the encrypted data
+        res.json({ encryptedData });
+
     } catch (error) {
         console.error("Error generating game:", error);
         res.status(500).json({ error: "Internal server error" });
     }
 });
+
+// Route to generate and store game data
+// router.get("/generate-game", async (req, res) => {
+//     try {
+//         let chosenLength = parseInt(req.query.length) || 2;
+//         let gameData = generateGameData(chosenLength);
+
+//         // Generate a unique game ID
+//         const game = new Game({
+//             id: Math.floor(Math.random() * 1000000), // Generate a random game ID
+//             target: gameData.target,
+//             numbers: gameData.numbers,
+//             chosenNumbers: gameData.chosenNumbers,
+//             operatorPool: gameData.operatorPool
+//         });
+
+//         // Save to MongoDB
+//         const savedGame = await game.save();
+
+//         // Send response with the stored game details
+//         res.json({ gameId: savedGame.id, ...gameData });
+//     } catch (error) {
+//         console.error("Error generating game:", error);
+//         res.status(500).json({ error: "Internal server error" });
+//     }
+// });
 
 module.exports = router;

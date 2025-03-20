@@ -15,6 +15,7 @@ const Game1 = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [currGameId, setCurrGameId] = useState('');
+  const secretKey = 'Z8yd9sfG9h1r3f9$jb0vXp!92mbR6hFz';
 
   // Fetch game data on mount (assumes API returns 12 numbers and a target)
   useEffect(() => {
@@ -27,9 +28,11 @@ const Game1 = () => {
       setLoading(true);
       // We assume length=6 returns 12 cards along with a target
       const response = await axios.get(`https://mindsweeper-api.onrender.com/api/generate-game?length=6`);
+      const decryptedData = CryptoJS.AES.decrypt(response.data.encryptedData, secretKey).toString(CryptoJS.enc.Utf8);
+      const decryptedResponse = JSON.parse(decryptedData);
       const newGameData = {
-        ...response.data,
-        numbers: response.data.numbers.map((num) => ({
+        ...decryptedResponse.data,
+        numbers: decryptedResponse.data.numbers.map((num) => ({
           value: num,
           used: false,
         })),
@@ -135,7 +138,6 @@ const Game1 = () => {
 
   const addPoints = () => {
     const gameId = JSON.stringify(currGameId);
-    const secretKey = 'Z8yd9sfG9h1r3f9$jb0vXp!92mbR6hFz';
   
     const encryptedGameId = CryptoJS.AES.encrypt(gameId, secretKey).toString();
   
