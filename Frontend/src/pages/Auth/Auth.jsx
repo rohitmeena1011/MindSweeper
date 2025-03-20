@@ -7,6 +7,7 @@ import { AuthContext } from "../../AuthContext";
 const AuthForm = () => {
   const [isSignUp, setIsSignUp] = useState(false);
   const [username, setUsername] = useState("");
+  const [phoneNumber,setPhoneNumber] = useState()
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -65,7 +66,7 @@ const AuthForm = () => {
       const response = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(isSignUp ? { username, email, password } : { email, password }),
+        body: JSON.stringify(isSignUp ? { username, email, password, phoneNumber } : { email, password }),
       });
 
       const data = await response.json();
@@ -132,6 +133,19 @@ const AuthForm = () => {
               required
             />
           </div>
+          {isSignUp && (
+            <div className={styles.inputContainer}>
+              <span>👤</span>
+              <input
+                type="number"
+                name="phoneNumber"
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(e.target.value)}
+                placeholder="PhoneNumber"
+                required
+              />
+            </div>
+          )}
           <div className={styles.inputContainer}>
             <span>🔒</span>
             <input
