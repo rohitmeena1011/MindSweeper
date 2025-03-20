@@ -135,7 +135,7 @@ const AuthForm = () => {
           </div>
           {isSignUp && (
             <div className={styles.inputContainer}>
-              <span>👤</span>
+              <span>📞</span>
               <input
                 type="number"
                 name="phoneNumber"
