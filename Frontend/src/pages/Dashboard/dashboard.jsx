@@ -24,7 +24,7 @@ const Dashboard = () => {
 
   return (
       <div className="dashboard h-screen bg-gray-900 text-white flex flex-col">
-      <div className="typewriter mt-4 text-2xl">
+      <div className="typewriter mt-4 text-xl">
         <h1>Get Ready To Challenge Your Mind</h1>
       </div>
 

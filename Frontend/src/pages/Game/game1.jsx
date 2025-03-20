@@ -207,7 +207,7 @@ const Game1 = () => {
     );
 
   return (
-    <div style={{ textAlign: "center", padding: "20px" }}>
+    <div style={{ textAlign: "center", padding: "20px",overflowY: "auto" }}>
       <Typography variant="h4" gutterBottom color="primary">
         Target: {gameData.target}
       </Typography>

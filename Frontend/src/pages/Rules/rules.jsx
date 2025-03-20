@@ -3,7 +3,7 @@ import React from "react";
 
 function Rules() {
   return (
-    <div className="p-4">
+    <div className="p-10 overflow-y-auto h-screen">
       <h1 className="text-2xl font-bold mb-4 text-white">Game Rules</h1>
       <br />
       <h2 className="text-xl font-semibold mt-2 text-white">Objective</h2>
