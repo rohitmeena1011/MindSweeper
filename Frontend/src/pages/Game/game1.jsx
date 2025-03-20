@@ -30,7 +30,6 @@ const Game1 = () => {
       const response = await axios.get(`https://mindsweeper-api.onrender.com/api/generate-game?length=6`);
       const decryptedData = CryptoJS.AES.decrypt(response.data.encryptedData, secretKey).toString(CryptoJS.enc.Utf8);
       const decryptedResponse = JSON.parse(decryptedData);
-      console.log(decryptedResponse)
       const newGameData = {
         ...decryptedResponse,
         numbers: decryptedResponse.numbers.map((num) => ({
@@ -45,7 +44,6 @@ const Game1 = () => {
       setCurrGameId(gameId);
       setLoading(false);
     } catch (err) {
-      console.log(err)
       setError("Failed to load game data");
       setLoading(false);
     }
