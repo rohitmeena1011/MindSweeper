@@ -175,7 +175,7 @@ const Game1 = () => {
     ) {
       setMessage(`🎉 Correct in ${filledNumbersCount} moves! 15 points added.`);
       addPoints();
-      setScore((prev) => prev + 100);
+      setScore((prev) => prev + 15);
       setTimeout(() => {
         fetchGameData();
       }, 2000);
@@ -212,9 +212,6 @@ const Game1 = () => {
     <div style={{ textAlign: "center", padding: "20px",overflowY: "auto" }}>
       <Typography variant="h4" gutterBottom color="primary">
         Target: {gameData.target}
-      </Typography>
-      <Typography variant="h6" color="primary">
-        Score: {score}
       </Typography>
 
       {/* Cards Grid – card values are always visible */}
