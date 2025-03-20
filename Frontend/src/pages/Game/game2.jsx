@@ -38,7 +38,7 @@ const Game2 = () => {
         .then(response => response.json())
         .then(data => {
             // Decrypt the encrypted response
-            const decryptedData = CryptoJS.AES.decrypt(data.encryptedData, SECRET_KEY).toString(CryptoJS.enc.Utf8);
+            const decryptedData = CryptoJS.AES.decrypt(data.encryptedData, secretKey).toString(CryptoJS.enc.Utf8);
             const gameData = JSON.parse(decryptedData); // Parse JSON after decryption
 
             // API returns: { target, chosenNumbers, operatorPool, gameId }
