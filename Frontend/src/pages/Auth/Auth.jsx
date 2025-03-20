@@ -21,7 +21,7 @@ const AuthForm = () => {
   const nowIST = new Date(now.getTime());
 
   // Restriction Date: 2:00 PM IST, 20 March 2025
-  const restrictedDate = new Date("2025-03-20T14:00:00+05:30");
+  const restrictedDate = new Date("2025-03-20T04:00:00+05:30");
 
   // Countdown Timer Effect
   useEffect(() => {
