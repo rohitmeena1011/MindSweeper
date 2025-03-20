@@ -45,6 +45,7 @@ const Game1 = () => {
       setCurrGameId(gameId);
       setLoading(false);
     } catch (err) {
+      console.log(err)
       setError("Failed to load game data");
       setLoading(false);
     }
