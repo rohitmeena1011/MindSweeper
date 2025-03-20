@@ -137,7 +137,7 @@ const AuthForm = () => {
             <div className={styles.inputContainer}>
               <span>📞</span>
               <input
-                type="number"
+                type="tel"
                 name="phoneNumber"
                 value={phoneNumber}
                 onChange={(e) => setPhoneNumber(e.target.value)}
