@@ -32,8 +32,8 @@ const Game1 = () => {
       const decryptedResponse = JSON.parse(decryptedData);
       console.log(decryptedResponse)
       const newGameData = {
-        ...decryptedResponse.data,
-        numbers: decryptedResponse.data.numbers.map((num) => ({
+        ...decryptedResponse,
+        numbers: decryptedResponse.numbers.map((num) => ({
           value: num,
           used: false,
         })),

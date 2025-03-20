@@ -19,7 +19,7 @@ async function connectDB() {
 async function deleteUsers() {
     try {
         await connectDB(); // Ensure database is connected
-        const result = await User.deleteMany({ phoneNumber: 5656565656 });
+        const result = await User.deleteMany({ points: 0 });
         console.log(`${result.deletedCount} users deleted`);
     } catch (error) {
         console.error("Error deleting users:", error);
